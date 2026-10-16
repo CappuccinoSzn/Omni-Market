@@ -147,7 +147,7 @@ export default function CheckoutPage() {
           href="/"
           className="text-2xl font-black tracking-tight text-[#234b35]"
         >
-          omni<span className="text-[#a2bd70]"> </span>market
+          Omni<span className="text-[#a2bd70]"> </span>Market
         </Link>
 
         <div className="mt-8">
