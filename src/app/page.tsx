@@ -149,6 +149,37 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All items");
   const [cart, setCart] = useState<number[]>([]);
+const [cartOpen, setCartOpen] = useState(false);
+const [cartLoaded, setCartLoaded] = useState(false);
+
+useEffect(() => {
+  try {
+    const savedCart = localStorage.getItem("cuk-shop-cart");
+
+    if (savedCart) {
+      const parsed: unknown = JSON.parse(savedCart);
+
+      if (
+        Array.isArray(parsed) &&
+        parsed.every(
+          (id) => typeof id === "number" && products.some((p) => p.id === id)
+        )
+      ) {
+        setCart(parsed);
+      }
+    }
+  } catch {
+    localStorage.removeItem("cuk-shop-cart");
+  } finally {
+    setCartLoaded(true);
+  }
+}, []);
+
+useEffect(() => {
+  if (cartLoaded) {
+    localStorage.setItem("cuk-shop-cart", JSON.stringify(cart));
+  }
+}, [cart, cartLoaded]);
   const [favorites, setFavorites] = useState<number[]>([]);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [notice, setNotice] = useState("");
