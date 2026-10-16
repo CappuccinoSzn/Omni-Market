@@ -314,7 +314,8 @@ function decreaseQuantity(id: number) {
             </a>
 
             <button
-              onClick={() => {
+              onClick={() => setCartOpen(true)}
+              onMouseEnter={() => {
                 setNotice(
                   cart.length
                     ? `${cart.length} item(s) in your cart`
