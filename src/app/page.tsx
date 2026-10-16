@@ -815,7 +815,7 @@ export default function Home() {
         </div>
 
         <div className="mx-auto mt-10 flex max-w-[1360px] flex-col justify-between gap-3 border-t border-[#e9eae3] pt-6 text-xs text-gray-500 sm:flex-row sm:items-center">
-          <p>© {new Date().getFullYear()} CUK Shop. All rights reserved.</p>
+          <p>© 2026 CUK Shop. All rights reserved.</p>
           <p>Made for discovery. Built for everyone in Kenya.</p>
         </div>
       </footer>
