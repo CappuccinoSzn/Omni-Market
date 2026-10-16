@@ -184,7 +184,33 @@ useEffect(() => {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [notice, setNotice] = useState("");
 
-  const filteredProducts = useMemo(() => {
+  const cartItems = useMemo(() => {
+  return products
+    .map((product) => ({
+      ...product,
+      quantity: cart.filter((id) => id === product.id).length,
+    }))
+    .filter((product) => product.quantity > 0);
+}, [cart]);
+
+const cartTotal = cartItems.reduce(
+  (total, item) => total + item.price * item.quantity,
+  0
+);
+
+function removeFromCart(id: number) {
+  setCart((current) => current.filter((item) => item !== id));
+}
+
+function decreaseQuantity(id: number) {
+  setCart((current) => {
+    const index = current.indexOf(id);
+
+    if (index === -1) return current;
+
+    return current.filter((_, i) => i !== index);
+  });
+}
     const term = query.trim().toLowerCase();
 
     return products.filter((product) => {
