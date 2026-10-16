@@ -211,6 +211,8 @@ function decreaseQuantity(id: number) {
     return current.filter((_, i) => i !== index);
   });
 }
+
+  const filteredProducts = useMemo(() => {
     const term = query.trim().toLowerCase();
 
     return products.filter((product) => {
