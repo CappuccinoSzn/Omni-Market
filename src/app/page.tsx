@@ -769,6 +769,7 @@ export default function Home() {
         </div>
       </section>
 
+
       {/* Footer */}
       <footer className="border-t border-[#e6e8df] bg-white px-4 pb-8 pt-12 sm:px-8 sm:pt-14 lg:px-12">
         <div className="mx-auto grid max-w-[1360px] gap-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
@@ -777,7 +778,7 @@ export default function Home() {
               href="/"
               className="text-3xl font-black tracking-[-1.5px] text-[#234b35]"
             >
-              omni<span className="text-[#a2bd70]"> </span>market
+              cuk<span className="text-[#a2bd70]">.</span>shop
             </a>
             <p className="mt-4 max-w-xs text-sm leading-6 text-gray-500">
               Discover good finds, connect with sellers and shop your way.
@@ -813,13 +814,12 @@ export default function Home() {
           </div>
         </div>
 
-       return (
-  <div className="mx-auto mt-10 flex max-w-[1360px] flex-col justify-between gap-3 border-t border-[#e9eae3] pt-6 text-xs text-gray-500 sm:flex-row sm:items-center">
-  <p>© {new Date().getFullYear()} Omni Market. All rights reserved.</p>
-  <p>Made for discovery. Built for everyone in Kenya.</p>
-</div>
-);
+        <div className="mx-auto mt-10 flex max-w-[1360px] flex-col justify-between gap-3 border-t border-[#e9eae3] pt-6 text-xs text-gray-500 sm:flex-row sm:items-center">
+          <p>© {new Date().getFullYear()} CUK Shop. All rights reserved.</p>
+          <p>Made for discovery. Built for everyone in Kenya.</p>
+        </div>
       </footer>
+
 
       {/* Feedback toast */}
       {notice && (
