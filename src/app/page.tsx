@@ -191,7 +191,7 @@ export default function Home() {
       <div className="bg-[#234b35] px-4 py-2.5 text-center text-xs font-medium tracking-wide text-white sm:text-sm">
         Your next great find is closer than you think.
         <span className="ml-2 hidden sm:inline">
-          Shop smarter with CUK Shop.
+          Shop smarter with Omni Market.
         </span>
       </div>
 
@@ -814,8 +814,8 @@ export default function Home() {
         </div>
 
         <div className="mx-auto mt-10 flex max-w-[1360px] flex-col justify-between gap-3 border-t border-[#e9eae3] pt-6 text-xs text-gray-500 sm:flex-row sm:items-center">
-          <p>© {new Date().getFullYear()} CUK Shop. All rights reserved.</p>
-          <p>Made for discovery. Built for everyone in Kenya.</p>
+          <p>© {new Date().getFullYear()} Omni Market. All rights reserved.</p>
+          <p>Made for discovery. Made in Kenya.</p>
         </div>
       </footer>
 
