@@ -813,10 +813,16 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mx-auto mt-10 flex max-w-[1360px] flex-col justify-between gap-3 border-t border-[#e9eae3] pt-6 text-xs text-gray-500 sm:flex-row sm:items-center">
-          <p>© {new Date().getFullYear()} Omni Market. All rights reserved.</p>
-          <p>Made for discovery. Built for everyone in Kenya.</p>
-        </div>
+       return (
+  <>
+    
+
+    <div className="mx-auto mt-10 flex max-w-[1360px] flex-col justify-between gap-3 border-t border-[#e9eae3] pt-6 text-xs text-gray-500 sm:flex-row sm:items-center">
+      <p>© {new Date().getFullYear()} Omni Market. All rights reserved.</p>
+      <p>Made for discovery. Built for everyone in Kenya.</p>
+    </div>
+  </>
+);
       </footer>
 
       {/* Feedback toast */}
