@@ -5,7 +5,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Omni Market | Buy and Sell Online",
   description:
-    "Discover products, shop online, and connect with sellers on CUK Shop.",
+    "Discover products, shop online, and connect with sellers on Omni Market.",
 };
 
 export default function RootLayout({
