@@ -154,7 +154,7 @@ const [cartLoaded, setCartLoaded] = useState(false);
 
 useEffect(() => {
   try {
-    const savedCart = localStorage.getItem("cuk-shop-cart");
+    const savedCart = localStorage.getItem("omni-market-cart");
 
     if (savedCart) {
       const parsed: unknown = JSON.parse(savedCart);
@@ -169,7 +169,7 @@ useEffect(() => {
       }
     }
   } catch {
-    localStorage.removeItem("cuk-shop-cart");
+    localStorage.removeItem("omni-market-cart");
   } finally {
     setCartLoaded(true);
   }
@@ -177,7 +177,7 @@ useEffect(() => {
 
 useEffect(() => {
   if (cartLoaded) {
-    localStorage.setItem("cuk-shop-cart", JSON.stringify(cart));
+    localStorage.setItem("omni-market-cart", JSON.stringify(cart));
   }
 }, [cart, cartLoaded]);
   const [favorites, setFavorites] = useState<number[]>([]);
@@ -259,7 +259,7 @@ function decreaseQuantity(id: number) {
         <div className="mx-auto flex max-w-[1440px] items-center gap-5 px-4 py-4 sm:px-8 lg:px-12">
           <a href="/" className="shrink-0">
             <span className="block text-[25px] font-black tracking-[-1.6px] text-[#234b35] sm:text-3xl">
-              cuk<span className="text-[#a2bd70]">.</span>shop
+              Omni<span className="text-[#a2bd70]"> </span>Market
             </span>
             <span className="mt-0.5 block text-[9px] font-semibold uppercase tracking-[2px] text-gray-500">
               Discover something good
@@ -838,7 +838,7 @@ function decreaseQuantity(id: number) {
               href="/"
               className="text-3xl font-black tracking-[-1.5px] text-[#234b35]"
             >
-              cuk<span className="text-[#a2bd70]">.</span>shop
+              Omni<span className="text-[#a2bd70]"> </span>Market
             </a>
             <p className="mt-4 max-w-xs text-sm leading-6 text-gray-500">
               Discover good finds, connect with sellers and shop your way.
@@ -875,8 +875,8 @@ function decreaseQuantity(id: number) {
         </div>
 
         <div className="mx-auto mt-10 flex max-w-[1360px] flex-col justify-between gap-3 border-t border-[#e9eae3] pt-6 text-xs text-gray-500 sm:flex-row sm:items-center">
-          <p>© 2026 CUK Shop. All rights reserved.</p>
-          <p>Made for discovery. Built for everyone in Kenya.</p>
+          <p>© 2026 Omni Market. All rights reserved.</p>
+          <p>Good finds. Better prices.</p>
         </div>
       </footer>
 
