@@ -10,6 +10,7 @@ import {
   Heart,
   Menu,
   Search,
+  SlidersHorizontal,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
@@ -181,7 +182,31 @@ useEffect(() => {
   }
 }, [cart, cartLoaded]);
   const [favorites, setFavorites] = useState<number[]>([]);
+  const [favoritesLoaded, setFavoritesLoaded] = useState(false);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [sortBy, setSortBy] = useState("featured");
+  const [selectedProduct, setSelectedProduct] = useState<(typeof products)[number] | null>(null);
   const [mobileMenu, setMobileMenu] = useState(false);
+
+  useEffect(() => {
+    try {
+      const savedFavorites = localStorage.getItem("Omni Market-favorites");
+      if (savedFavorites) {
+        const parsed: unknown = JSON.parse(savedFavorites);
+        if (Array.isArray(parsed) && parsed.every((id) => typeof id === "number" && products.some((product) => product.id === id))) {
+          setFavorites(parsed);
+        }
+      }
+    } catch {
+      localStorage.removeItem("Omni Market-favorites");
+    } finally {
+      setFavoritesLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (favoritesLoaded) localStorage.setItem("Omni Market-favorites", JSON.stringify(favorites));
+  }, [favorites, favoritesLoaded]);
   const [notice, setNotice] = useState("");
 
   const cartItems = useMemo(() => {
@@ -226,9 +251,15 @@ function decreaseQuantity(id: number) {
         product.seller.toLowerCase().includes(term) ||
         product.location.toLowerCase().includes(term);
 
-      return matchesCategory && matchesSearch;
+      const matchesFavorites = !showFavoritesOnly || favorites.includes(product.id);
+      return matchesCategory && matchesSearch && matchesFavorites;
+    }).sort((a, b) => {
+      if (sortBy === "price-low") return a.price - b.price;
+      if (sortBy === "price-high") return b.price - a.price;
+      if (sortBy === "name") return a.name.localeCompare(b.name);
+      return 0;
     });
-  }, [query, category]);
+  }, [query, category, showFavoritesOnly, favorites, sortBy]);
 
   function addToCart(id: number) {
     setCart((current) => [...current, id]);
@@ -317,14 +348,6 @@ function decreaseQuantity(id: number) {
 
             <button
               onClick={() => setCartOpen(true)}
-              onMouseEnter={() => {
-                setNotice(
-                  cart.length
-                    ? `${cart.length} item(s) in your cart`
-                    : "Your cart is empty"
-                );
-                window.setTimeout(() => setNotice(""), 2200);
-              }}
               aria-label={`Shopping cart with ${cart.length} items`}
               className="relative rounded-full border border-[#e5e7df] bg-white p-2.5 transition hover:border-[#234b35] hover:bg-[#f4f7f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a2bd70]"
             >
@@ -657,7 +680,7 @@ function decreaseQuantity(id: number) {
             </button>
           </div>
 
-          <div className="mt-6 flex gap-2 overflow-x-auto pb-2">
+          <div className="mt-6 flex gap-2 overflow-x-auto pb-2" aria-label="Filter products by category">
             {categories.map((item) => (
               <button
                 key={item.name}
@@ -669,8 +692,30 @@ function decreaseQuantity(id: number) {
                 }`}
               >
                 {item.name}
+                <span className={`ml-2 text-[10px] ${category === item.name ? "text-white/70" : "text-gray-400"}`}>
+                  {item.name === "All items" ? products.length : products.filter((product) => product.category === item.name).length}
+                </span>
               </button>
             ))}
+          </div>
+
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-gray-500" aria-live="polite">Showing <span className="font-semibold text-[#26382a]">{filteredProducts.length}</span> of {showFavoritesOnly ? favorites.length : products.length} {showFavoritesOnly ? "favourite" : "products"}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <button type="button" onClick={() => setShowFavoritesOnly((value) => !value)} aria-pressed={showFavoritesOnly} className={`inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-xs font-semibold transition sm:text-sm ${showFavoritesOnly ? "border-[#234b35] bg-[#234b35] text-white" : "border-[#e4e6de] bg-white text-gray-600 hover:border-[#234b35]"}`}>
+                <Heart size={15} fill={showFavoritesOnly ? "currentColor" : "none"} /> Favourites {favorites.length > 0 && `(${favorites.length})`}
+              </button>
+              <label className="flex items-center gap-2 rounded-full border border-[#e4e6de] bg-white px-4 py-2.5 text-xs text-gray-600 sm:text-sm">
+                <SlidersHorizontal size={15} /> Sort
+                <select aria-label="Sort products" value={sortBy} onChange={(event) => setSortBy(event.target.value)} className="max-w-[145px] bg-transparent font-semibold text-[#26382a] outline-none">
+                  <option value="featured">Featured</option>
+                  <option value="price-low">Price: low to high</option>
+                  <option value="price-high">Price: high to low</option>
+                  <option value="name">Name: A–Z</option>
+                </select>
+              </label>
+              {(query || category !== "All items" || showFavoritesOnly || sortBy !== "featured") && <button type="button" onClick={() => { setQuery(""); setCategory("All items"); setShowFavoritesOnly(false); setSortBy("featured"); }} className="rounded-full px-3 py-2 text-xs font-semibold text-[#315e43] underline underline-offset-4">Reset</button>}
+            </div>
           </div>
 
           <div className="mt-5 grid grid-cols-2 gap-x-3 gap-y-7 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-9 lg:grid-cols-4">
@@ -687,18 +732,9 @@ function decreaseQuantity(id: number) {
                   className="relative overflow-hidden rounded-[16px] sm:rounded-[20px]"
                   style={{ backgroundColor: product.color }}
                 >
-                  <a
-                    href={`/products/${product.id}`}
-                    aria-label={`View ${product.name}`}
-                    className="block overflow-hidden"
-                  >
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      loading="lazy"
-                      className="aspect-[4/4.5] w-full object-cover transition duration-700 ease-out group-hover:scale-105"
-                    />
-                  </a>
+                  <button type="button" onClick={() => setSelectedProduct(product)} aria-label={`View details for ${product.name}`} className="block w-full overflow-hidden text-left">
+                    <img src={product.image} alt={product.name} loading="lazy" className="aspect-[4/4.5] w-full object-cover transition duration-700 ease-out group-hover:scale-105" />
+                  </button>
 
                   {product.badge && (
                     <span className="absolute left-2 top-2 rounded-full bg-white/95 px-2.5 py-1.5 text-[9px] font-semibold text-[#234b35] shadow-sm sm:left-3 sm:top-3 sm:px-3 sm:text-[10px]">
@@ -739,12 +775,9 @@ function decreaseQuantity(id: number) {
                 <div className="px-1 pt-3 sm:px-1.5 sm:pt-4">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="text-sm font-semibold leading-snug text-[#26382a] sm:text-base">
-                      <a
-                        href={`/products/${product.id}`}
-                        className="transition hover:text-[#719267]"
-                      >
+                      <button type="button" onClick={() => setSelectedProduct(product)} className="text-left transition hover:text-[#719267] focus-visible:underline">
                         {product.name}
-                      </a>
+                      </button>
                     </h3>
                   </div>
 
@@ -775,18 +808,16 @@ function decreaseQuantity(id: number) {
           </div>
 
           {filteredProducts.length === 0 && (
-            <div className="rounded-3xl border border-dashed border-[#dfe3d9] py-16 text-center">
-              <Search className="mx-auto text-gray-400" size={30} />
-              <h3 className="mt-4 text-lg font-semibold">
-                No matching products yet
-              </h3>
-              <p className="mt-2 text-sm text-gray-500">
-                Try another search or explore a different category.
-              </p>
+            <div className="rounded-3xl border border-dashed border-[#dfe3d9] bg-white/70 px-5 py-16 text-center">
+              {showFavoritesOnly ? <Heart className="mx-auto text-gray-400" size={30} /> : <Search className="mx-auto text-gray-400" size={30} />}
+              <h3 className="mt-4 text-lg font-semibold">{showFavoritesOnly && favorites.length === 0 ? "No favourites saved yet" : "No matching products found"}</h3>
+              <p className="mt-2 text-sm text-gray-500">{showFavoritesOnly ? "Tap the heart on any product to save it here." : "Try a different keyword, category or sort option."}</p>
               <button
                 onClick={() => {
                   setQuery("");
                   setCategory("All items");
+                  setShowFavoritesOnly(false);
+                  setSortBy("featured");
                 }}
                 className="mt-5 rounded-full bg-[#234b35] px-5 py-3 text-sm font-semibold text-white"
               >
@@ -796,6 +827,28 @@ function decreaseQuantity(id: number) {
           )}
         </div>
       </section>
+
+      {/* Product quick-view modal */}
+      {selectedProduct && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-3 backdrop-blur-sm sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
+          <section role="dialog" aria-modal="true" aria-labelledby="product-modal-title" className="relative grid max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[28px] bg-[#fcfcf9] shadow-2xl sm:grid-cols-2 sm:overflow-hidden">
+            <button type="button" onClick={() => setSelectedProduct(null)} aria-label="Close product details" className="absolute right-3 top-3 z-10 rounded-full bg-white/95 p-2 shadow transition hover:bg-[#eef1e9]"><X size={20} /></button>
+            <div className="min-h-[240px] sm:min-h-[460px]" style={{ backgroundColor: selectedProduct.color }}><img src={selectedProduct.image} alt={selectedProduct.name} className="h-full max-h-[360px] w-full object-cover sm:max-h-none" /></div>
+            <div className="flex flex-col p-5 sm:p-8">
+              <div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-[#edf2e8] px-3 py-1.5 text-xs font-semibold text-[#315e43]">{selectedProduct.category}</span><span className="rounded-full border border-[#e2e5dc] px-3 py-1.5 text-xs text-gray-600">{selectedProduct.condition}</span></div>
+              <h2 id="product-modal-title" className="mt-4 pr-8 text-2xl font-bold tracking-tight sm:text-3xl">{selectedProduct.name}</h2>
+              <div className="mt-3 flex flex-wrap items-baseline gap-2"><span className="text-2xl font-bold text-[#234b35]">{money(selectedProduct.price)}</span>{selectedProduct.oldPrice && <span className="text-sm text-gray-400 line-through">{money(selectedProduct.oldPrice)}</span>}</div>
+              {selectedProduct.oldPrice && <p className="mt-1 text-xs font-medium text-[#527b43]">Save {money(selectedProduct.oldPrice - selectedProduct.price)}</p>}
+              <div className="mt-6 rounded-2xl border border-[#e8eae2] bg-white p-4"><p className="text-xs uppercase tracking-wider text-gray-400">Seller</p><p className="mt-1 font-semibold">{selectedProduct.seller}</p><p className="mt-1 text-sm text-gray-500">{selectedProduct.location}, Kenya</p></div>
+              <p className="mt-5 text-sm leading-6 text-gray-600">Listed as <strong>{selectedProduct.condition.toLowerCase()}</strong>. Review the item details and seller information before proceeding with your purchase.</p>
+              <div className="mt-auto flex gap-2 pt-7">
+                <button type="button" onClick={() => toggleFavorite(selectedProduct.id)} className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full border transition ${favorites.includes(selectedProduct.id) ? "border-[#234b35] bg-[#edf2e8] text-[#234b35]" : "border-[#dfe3d9] bg-white text-gray-600"}`} aria-label={favorites.includes(selectedProduct.id) ? "Remove from favourites" : "Add to favourites"}><Heart size={19} fill={favorites.includes(selectedProduct.id) ? "currentColor" : "none"} /></button>
+                <button type="button" onClick={() => { addToCart(selectedProduct.id); setSelectedProduct(null); }} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#234b35] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#315e43]"><ShoppingBag size={17} /> Add to bag</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
 
       {/* Seller call to action */}
       <section className="px-4 pb-16 sm:px-8 sm:pb-24 lg:px-12">
@@ -838,7 +891,7 @@ function decreaseQuantity(id: number) {
               href="/"
               className="text-3xl font-black tracking-[-1.5px] text-[#234b35]"
             >
-              Omni<span className="text-[#a2bd70]">.</span>Market
+              cuk<span className="text-[#a2bd70]">.</span>shop
             </a>
             <p className="mt-4 max-w-xs text-sm leading-6 text-gray-500">
               Discover good finds, connect with sellers and shop your way.
@@ -875,7 +928,7 @@ function decreaseQuantity(id: number) {
         </div>
 
         <div className="mx-auto mt-10 flex max-w-[1360px] flex-col justify-between gap-3 border-t border-[#e9eae3] pt-6 text-xs text-gray-500 sm:flex-row sm:items-center">
-          <p>© 2026 Omni Market. All rights reserved.</p>
+          <p>© 2026 CUK Shop. All rights reserved.</p>
           <p>Made for discovery. Built for everyone in Kenya.</p>
         </div>
       </footer>
