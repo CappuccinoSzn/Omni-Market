@@ -154,7 +154,7 @@ const [cartLoaded, setCartLoaded] = useState(false);
 
 useEffect(() => {
   try {
-    const savedCart = localStorage.getItem("cuk-shop-cart");
+    const savedCart = localStorage.getItem("Omni Market-cart");
 
     if (savedCart) {
       const parsed: unknown = JSON.parse(savedCart);
@@ -259,7 +259,7 @@ function decreaseQuantity(id: number) {
         <div className="mx-auto flex max-w-[1440px] items-center gap-3 px-4 py-3.5 sm:gap-5 sm:px-8 sm:py-4 lg:px-12">
           <a href="/" className="shrink-0">
             <span className="block text-[25px] font-black tracking-[-1.8px] text-[#234b35] sm:text-3xl">
-              cuk<span className="text-[#a2bd70]">.</span>shop
+              Omni<span className="text-[#a2bd70]">.</span>Market
             </span>
             <span className="mt-0.5 block text-[9px] font-semibold uppercase tracking-[2px] text-gray-500">
               Discover something good
