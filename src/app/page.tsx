@@ -154,7 +154,7 @@ const [cartLoaded, setCartLoaded] = useState(false);
 
 useEffect(() => {
   try {
-    const savedCart = localStorage.getItem("omni-market-cart");
+    const savedCart = localStorage.getItem("cuk-shop-cart");
 
     if (savedCart) {
       const parsed: unknown = JSON.parse(savedCart);
@@ -169,7 +169,7 @@ useEffect(() => {
       }
     }
   } catch {
-    localStorage.removeItem("omni-market-cart");
+    localStorage.removeItem("Omni Market-cart");
   } finally {
     setCartLoaded(true);
   }
@@ -177,7 +177,7 @@ useEffect(() => {
 
 useEffect(() => {
   if (cartLoaded) {
-    localStorage.setItem("omni-market-cart", JSON.stringify(cart));
+    localStorage.setItem("Omni Market-cart", JSON.stringify(cart));
   }
 }, [cart, cartLoaded]);
   const [favorites, setFavorites] = useState<number[]>([]);
@@ -245,21 +245,21 @@ function decreaseQuantity(id: number) {
   }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#fcfcf9] text-[#202a22]">
+    <main className="min-h-screen overflow-hidden bg-[radial-gradient(ellipse_at_top,_#f0f5e9_0%,_#fcfcf9_38%,_#fcfcf9_100%)] text-[#202a22]">
       {/* Announcement */}
-      <div className="bg-[#234b35] px-4 py-2.5 text-center text-xs font-medium tracking-wide text-white sm:text-sm">
+      <div className="bg-[#1d3d2b] px-4 py-2.5 text-center text-[11px] font-semibold tracking-wide text-white sm:text-xs">
         Your next great find is closer than you think.
         <span className="ml-2 hidden sm:inline">
-          Shop smarter with Omni Market.
+          A better way to buy, sell and discover.
         </span>
       </div>
 
       {/* Navigation */}
-      <header className="sticky top-0 z-40 border-b border-black/[0.06] bg-[#fcfcf9]/95 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1440px] items-center gap-5 px-4 py-4 sm:px-8 lg:px-12">
+      <header className="sticky top-0 z-40 border-b border-[#e7eadf]/80 bg-[#fcfcf9]/90 shadow-[0_8px_30px_rgba(28,54,34,0.035)] backdrop-blur-2xl">
+        <div className="mx-auto flex max-w-[1440px] items-center gap-3 px-4 py-3.5 sm:gap-5 sm:px-8 sm:py-4 lg:px-12">
           <a href="/" className="shrink-0">
-            <span className="block text-[25px] font-black tracking-[-1.6px] text-[#234b35] sm:text-3xl">
-              Omni<span className="text-[#a2bd70]"> </span>Market
+            <span className="block text-[25px] font-black tracking-[-1.8px] text-[#234b35] sm:text-3xl">
+              cuk<span className="text-[#a2bd70]">.</span>shop
             </span>
             <span className="mt-0.5 block text-[9px] font-semibold uppercase tracking-[2px] text-gray-500">
               Discover something good
@@ -273,7 +273,7 @@ function decreaseQuantity(id: number) {
                 .getElementById("products")
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
-            className="ml-auto hidden max-w-[490px] flex-1 items-center rounded-full border border-[#e5e7df] bg-white px-4 py-3 transition focus-within:border-[#719477] md:flex"
+            className="ml-auto hidden max-w-[520px] flex-1 items-center rounded-full border border-[#e2e7dc] bg-white/95 px-4 py-3 shadow-sm transition focus-within:border-[#719477] focus-within:shadow-[0_0_0_4px_rgba(113,146,103,0.10)] md:flex"
           >
             <Search size={19} className="shrink-0 text-gray-400" />
             <input
@@ -326,7 +326,7 @@ function decreaseQuantity(id: number) {
                 window.setTimeout(() => setNotice(""), 2200);
               }}
               aria-label={`Shopping cart with ${cart.length} items`}
-              className="relative rounded-full border border-[#e5e7df] bg-white p-2.5 transition hover:border-[#234b35]"
+              className="relative rounded-full border border-[#e5e7df] bg-white p-2.5 transition hover:border-[#234b35] hover:bg-[#f4f7f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a2bd70]"
             >
               <ShoppingBag size={19} />
               {cart.length > 0 && (
@@ -387,20 +387,20 @@ function decreaseQuantity(id: number) {
       </header>
 
       {/* Hero */}
-      <section className="px-4 pb-12 pt-8 sm:px-8 sm:pb-16 sm:pt-12 lg:px-12 lg:pt-16">
-        <div className="mx-auto grid max-w-[1360px] items-center gap-10 lg:grid-cols-[1fr_0.92fr] lg:gap-12">
+      <section className="relative px-4 pb-12 pt-8 sm:px-8 sm:pb-20 sm:pt-12 lg:px-12 lg:pb-24 lg:pt-16">
+        <div className="relative mx-auto grid max-w-[1360px] items-center gap-10 lg:grid-cols-[1fr_0.92fr] lg:gap-12">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65 }}
             className="relative z-10"
           >
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#dfe7d7] bg-[#f0f4eb] px-4 py-2 text-xs font-semibold text-[#315e43] sm:text-sm">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#dfe7d7] bg-white/80 px-4 py-2 text-xs font-semibold text-[#315e43] shadow-sm sm:text-sm">
               <Sparkles size={15} />
               A little marketplace with big possibilities
             </div>
 
-            <h1 className="max-w-2xl text-[46px] font-semibold leading-[1.04] tracking-[-2.5px] sm:text-6xl lg:text-[76px] lg:tracking-[-4px]">
+            <h1 className="max-w-2xl text-[43px] font-semibold leading-[1.02] tracking-[-2.8px] sm:text-6xl lg:text-[78px] lg:tracking-[-4.5px]">
               Good finds.
               <br />
               <span className="font-serif font-normal italic text-[#73965e]">
@@ -410,7 +410,7 @@ function decreaseQuantity(id: number) {
               Your kind of shop.
             </h1>
 
-            <p className="mt-6 max-w-lg text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
+            <p className="mt-6 max-w-lg text-base leading-7 text-[#59645a] sm:text-lg sm:leading-8">
               From everyday essentials to unexpected treasures, discover
               products from sellers across Kenya — all in one place.
             </p>
@@ -476,13 +476,13 @@ function decreaseQuantity(id: number) {
             initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.75, delay: 0.15 }}
-            className="relative mx-auto w-full max-w-[620px]"
+            className="relative mx-auto w-full max-w-[620px] [perspective:1000px]"
           >
             <div className="absolute -right-5 -top-5 h-36 w-36 rounded-full bg-[#e9efdf] blur-3xl" />
             <div className="absolute -bottom-8 -left-5 h-40 w-40 rounded-full bg-[#f3e7d7] blur-3xl" />
 
             <div className="relative grid grid-cols-[1.1fr_0.9fr] gap-3 sm:gap-4">
-              <div className="relative mt-10 overflow-hidden rounded-[28px] bg-[#eee6d9] sm:rounded-[36px]">
+              <div className="relative mt-10 overflow-hidden rounded-[28px] bg-[#eee6d9] shadow-[0_24px_60px_rgba(33,58,38,0.13)] ring-1 ring-black/[0.03] sm:rounded-[36px]">
                 <img
                   src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=900&q=85"
                   alt="Curated everyday fashion"
@@ -499,7 +499,7 @@ function decreaseQuantity(id: number) {
               </div>
 
               <div className="flex flex-col gap-3 sm:gap-4">
-                <div className="overflow-hidden rounded-[28px] bg-[#e7e9e0] sm:rounded-[36px]">
+                <div className="overflow-hidden rounded-[28px] bg-[#e7e9e0] shadow-[0_18px_45px_rgba(33,58,38,0.10)] ring-1 ring-black/[0.03] sm:rounded-[36px]">
                   <img
                     src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=700&q=85"
                     alt="Laptop and technology"
@@ -542,7 +542,7 @@ function decreaseQuantity(id: number) {
       </section>
 
       {/* Trust strip */}
-      <section className="border-y border-[#e9eae3] bg-white px-4 py-5 sm:px-8 lg:px-12">
+      <section className="border-y border-[#e9eae3] bg-white/85 px-4 py-6 shadow-[0_8px_30px_rgba(28,54,34,0.025)] sm:px-8 lg:px-12">
         <div className="mx-auto grid max-w-[1360px] grid-cols-1 gap-5 sm:grid-cols-3 sm:gap-8">
           <div className="flex items-center justify-center gap-3 sm:justify-start">
             <ShieldCheck className="text-[#658958]" size={23} />
@@ -605,7 +605,7 @@ function decreaseQuantity(id: number) {
                     .getElementById("products")
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className={`group rounded-2xl border p-4 text-left transition duration-200 hover:-translate-y-1 sm:p-5 ${
+                className={`group rounded-2xl border p-4 text-left shadow-[0_5px_18px_rgba(28,54,34,0.025)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(28,54,34,0.08)] sm:rounded-[22px] sm:p-5 ${
                   category === item.name
                     ? "border-[#234b35] bg-[#edf2e8]"
                     : "border-[#e9eae3] bg-white hover:border-[#cbd7c2]"
@@ -681,10 +681,10 @@ function decreaseQuantity(id: number) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.08 }}
                 transition={{ duration: 0.4, delay: (index % 4) * 0.06 }}
-                className="group min-w-0"
+                className="group min-w-0 rounded-[20px] border border-[#e9eae3]/80 bg-white p-2.5 shadow-[0_5px_20px_rgba(28,54,34,0.025)] transition duration-300 hover:-translate-y-1 hover:border-[#d7e0cf] hover:shadow-[0_18px_38px_rgba(28,54,34,0.09)] sm:rounded-[26px] sm:p-3"
               >
                 <div
-                  className="relative overflow-hidden rounded-2xl sm:rounded-[24px]"
+                  className="relative overflow-hidden rounded-[16px] sm:rounded-[20px]"
                   style={{ backgroundColor: product.color }}
                 >
                   <a
@@ -696,7 +696,7 @@ function decreaseQuantity(id: number) {
                       src={product.image}
                       alt={product.name}
                       loading="lazy"
-                      className="aspect-[4/4.4] w-full object-cover transition duration-500 group-hover:scale-105"
+                      className="aspect-[4/4.5] w-full object-cover transition duration-700 ease-out group-hover:scale-105"
                     />
                   </a>
 
@@ -729,16 +729,16 @@ function decreaseQuantity(id: number) {
 
                   <button
                     onClick={() => addToCart(product.id)}
-                    className="absolute bottom-2 right-2 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#234b35] shadow-md transition hover:scale-105 hover:bg-[#234b35] hover:text-white sm:bottom-3 sm:right-3"
+                    className="absolute bottom-2 right-2 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#234b35] shadow-[0_6px_18px_rgba(0,0,0,0.13)] transition duration-200 hover:scale-110 hover:bg-[#234b35] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a2bd70] sm:bottom-3 sm:right-3"
                     aria-label={`Add ${product.name} to cart`}
                   >
                     <ShoppingBag size={17} />
                   </button>
                 </div>
 
-                <div className="px-0.5 pt-3">
+                <div className="px-1 pt-3 sm:px-1.5 sm:pt-4">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-sm font-semibold leading-snug sm:text-base">
+                    <h3 className="text-sm font-semibold leading-snug text-[#26382a] sm:text-base">
                       <a
                         href={`/products/${product.id}`}
                         className="transition hover:text-[#719267]"
@@ -799,7 +799,7 @@ function decreaseQuantity(id: number) {
 
       {/* Seller call to action */}
       <section className="px-4 pb-16 sm:px-8 sm:pb-24 lg:px-12">
-        <div className="relative mx-auto max-w-[1360px] overflow-hidden rounded-[28px] bg-[#234b35] px-6 py-10 text-white sm:rounded-[36px] sm:px-12 sm:py-14 lg:px-16 lg:py-16">
+        <div className="relative mx-auto max-w-[1360px] overflow-hidden rounded-[28px] bg-[linear-gradient(120deg,#1d3d2b_0%,#234b35_55%,#355f40_100%)] px-6 py-10 text-white shadow-[0_28px_70px_rgba(35,75,53,0.18)] sm:rounded-[36px] sm:px-12 sm:py-14 lg:px-16 lg:py-16">
           <div className="absolute -right-16 -top-24 h-64 w-64 rounded-full border border-white/10 sm:h-96 sm:w-96" />
           <div className="absolute -right-4 -top-12 h-52 w-52 rounded-full border border-white/10 sm:h-72 sm:w-72" />
 
@@ -831,14 +831,14 @@ function decreaseQuantity(id: number) {
 
 
       {/* Footer */}
-      <footer className="border-t border-[#e6e8df] bg-white px-4 pb-8 pt-12 sm:px-8 sm:pt-14 lg:px-12">
+      <footer className="border-t border-[#e6e8df] bg-white/90 px-4 pb-8 pt-12 sm:px-8 sm:pt-14 lg:px-12">
         <div className="mx-auto grid max-w-[1360px] gap-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div>
             <a
               href="/"
               className="text-3xl font-black tracking-[-1.5px] text-[#234b35]"
             >
-              Omni<span className="text-[#a2bd70]"> </span>Market
+              Omni<span className="text-[#a2bd70]">.</span>Market
             </a>
             <p className="mt-4 max-w-xs text-sm leading-6 text-gray-500">
               Discover good finds, connect with sellers and shop your way.
@@ -876,7 +876,7 @@ function decreaseQuantity(id: number) {
 
         <div className="mx-auto mt-10 flex max-w-[1360px] flex-col justify-between gap-3 border-t border-[#e9eae3] pt-6 text-xs text-gray-500 sm:flex-row sm:items-center">
           <p>© 2026 Omni Market. All rights reserved.</p>
-          <p>Good finds. Better prices.</p>
+          <p>Made for discovery. Built for everyone in Kenya.</p>
         </div>
       </footer>
 
