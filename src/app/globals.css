@@ -22,6 +22,13 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
+  background: radial-gradient(
+      ellipse at top,
+      #f0f5e9 0%,
+      #fcfcf9 38%,
+      #fcfcf9 100%
+    )
+    no-repeat;
 }
 
 button,
