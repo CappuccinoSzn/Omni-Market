@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { ArrowRight, Heart, ShoppingBag } from "lucide-react";
-import { getProduct, money } from "@/app/lib/catalog";
+import { useCartView, useFavoriteProducts } from "@/app/lib/cart";
+import { money } from "@/app/lib/format";
 import { useApp } from "@/app/lib/store";
-import { btnGhost, btnPrimary, card, eyebrow } from "./styles";
+import ProductMedia from "./product-media";
+import { btnGhost, btnPrimary, card, eyebrow, noticePanel } from "./styles";
 
 export default function CartView() {
   const {
-    cartItems,
-    cartTotal,
     cartCount,
     addToCart,
     decreaseQuantity,
@@ -18,27 +18,70 @@ export default function CartView() {
     favorites,
     toggleFavorite,
   } = useApp();
+  const {
+    lines,
+    itemCount,
+    subtotal,
+    unavailable,
+    sellers,
+    ready,
+    status,
+    error,
+  } = useCartView();
+  const savedItems = useFavoriteProducts();
 
-  const savedItems = favorites
-    .map((id) => getProduct(id))
-    .filter((product): product is NonNullable<typeof product> => product !== null);
+  if (status === "error") {
+    return (
+      <main className="mx-auto w-full max-w-[1360px] px-4 py-16 sm:px-8 lg:px-12">
+        <div className={noticePanel}>
+          <p className="font-semibold">Your bag could not be priced.</p>
+          <p className="mt-1 text-[#40544a]">{error}</p>
+        </div>
+      </main>
+    );
+  }
 
-  if (cartItems.length === 0) {
+  if (!ready) {
+    return (
+      <main className="mx-auto w-full max-w-[1360px] px-4 py-16 sm:px-8 lg:px-12">
+        <h1 className="text-3xl font-semibold tracking-tight">
+          Your shopping bag
+        </h1>
+        <p className="mt-2 text-sm text-gray-500">
+          Matching {cartCount} saved item{cartCount === 1 ? "" : "s"} with live
+          listings...
+        </p>
+        <div className="mt-8 space-y-4">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <div key={index} className="h-36 animate-pulse rounded-3xl bg-[#eef1e9]" />
+          ))}
+        </div>
+      </main>
+    );
+  }
+
+  if (lines.length === 0) {
     return (
       <main className="mx-auto w-full max-w-[1360px] px-4 py-16 sm:px-8 lg:px-12">
         <div className={`${card} text-center`}>
           <ShoppingBag size={44} className="mx-auto text-[#719267]" />
           <h1 className="mt-5 text-2xl font-semibold sm:text-3xl">
-            Your bag is empty
+            {cartCount > 0 ? "Your bag has no live listings" : "Your bag is empty"}
           </h1>
           <p className="mx-auto mt-2 max-w-md text-sm text-gray-500">
-            Explore the marketplace and add something you love. Your bag is
-            saved on this device, so you can come back any time.
+            {cartCount > 0
+              ? `${unavailable} item${unavailable === 1 ? "" : "s"} in your bag point at listings that are no longer published. Nothing was charged.`
+              : "Explore the marketplace and add something you love. Your bag is saved on this device, so you can come back any time."}
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link href="/products" className={btnPrimary}>
-              Browse products <ArrowRight size={16} />
+              Browse listings <ArrowRight size={16} />
             </Link>
+            {cartCount > 0 && (
+              <button onClick={clearCart} className={btnGhost}>
+                Clear saved ids
+              </button>
+            )}
             <Link href="/sell" className={btnGhost}>
               Sell an item
             </Link>
@@ -55,14 +98,16 @@ export default function CartView() {
                   key={product.id}
                   className="flex items-center gap-4 rounded-2xl border border-[#e6e8df] bg-white p-3"
                 >
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="h-20 w-20 rounded-xl object-cover"
-                  />
+                  <div className="w-20 shrink-0">
+                    <ProductMedia
+                      product={product}
+                      rounded="rounded-xl"
+                      className="h-20"
+                    />
+                  </div>
                   <div className="min-w-0 flex-1">
                     <Link
-                      href={`/products/${product.slug}`}
+                      href={`/products/${product.id}`}
                       className="text-sm font-semibold hover:text-[#234b35]"
                     >
                       {product.name}
@@ -103,7 +148,9 @@ export default function CartView() {
             Your shopping bag
           </h1>
           <p className="mt-2 text-sm text-gray-500">
-            {cartCount} item(s) from {cartItems.length} seller listing(s).
+            {itemCount} item{itemCount === 1 ? "" : "s"} from {lines.length}{" "}
+            listing{lines.length === 1 ? "" : "s"} · {sellers} seller
+            {sellers === 1 ? "" : "s"}.
           </p>
         </div>
         <button
@@ -116,49 +163,61 @@ export default function CartView() {
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="space-y-5">
-          {cartItems.map((item) => (
+          {unavailable > 0 && (
+            <p className="rounded-2xl bg-[#fdf1f1] px-4 py-3 text-xs text-red-700">
+              {unavailable} item{unavailable === 1 ? "" : "s"} you saved are no
+              longer listed and are not included below.
+            </p>
+          )}
+
+          {lines.map((line) => (
             <article
-              key={item.id}
+              key={line.product.id}
               className="flex flex-wrap gap-4 rounded-3xl border border-[#e6e8df] bg-white p-4 sm:flex-nowrap sm:p-5"
             >
-              <img
-                src={item.image}
-                alt={item.name}
-                className="h-28 w-28 rounded-2xl object-cover"
-              />
+              <div className="w-28 shrink-0">
+                <ProductMedia
+                  product={line.product}
+                  rounded="rounded-2xl"
+                  className="h-28"
+                />
+              </div>
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h2 className="text-base font-semibold">
                       <Link
-                        href={`/products/${item.slug}`}
+                        href={`/products/${line.product.id}`}
                         className="hover:text-[#234b35]"
                       >
-                        {item.name}
+                        {line.product.name}
                       </Link>
                     </h2>
                     <p className="mt-1 text-xs text-gray-500">
-                      {item.condition} · {item.category} · {item.seller},{" "}
-                      {item.location}
+                      {line.product.condition} · {line.product.category} ·{" "}
+                      {line.product.seller}, {line.product.location}
                     </p>
                   </div>
                   <button
-                    onClick={() => toggleFavorite(item.id)}
+                    onClick={() => toggleFavorite(line.product.id)}
                     aria-label={
-                      favorites.includes(item.id)
+                      favorites.includes(line.product.id)
                         ? "Remove from favourites"
                         : "Add to favourites"
                     }
+                    aria-pressed={favorites.includes(line.product.id)}
                     className={`shrink-0 rounded-full border p-2 transition ${
-                      favorites.includes(item.id)
+                      favorites.includes(line.product.id)
                         ? "border-[#234b35] bg-[#edf2e8] text-[#234b35]"
                         : "border-[#dfe3d9] text-gray-500 hover:border-[#234b35]"
                     }`}
                   >
                     <Heart
                       size={16}
-                      fill={favorites.includes(item.id) ? "currentColor" : "none"}
+                      fill={
+                        favorites.includes(line.product.id) ? "currentColor" : "none"
+                      }
                     />
                   </button>
                 </div>
@@ -166,18 +225,18 @@ export default function CartView() {
                 <div className="mt-4 flex flex-wrap items-center gap-3">
                   <div className="flex items-center gap-2 rounded-full border border-[#dfe3d9] px-2 py-1.5">
                     <button
-                      onClick={() => decreaseQuantity(item.id)}
-                      aria-label={`Decrease ${item.name} quantity`}
+                      onClick={() => decreaseQuantity(line.product.id)}
+                      aria-label={`Decrease ${line.product.name} quantity`}
                       className="flex h-7 w-7 items-center justify-center rounded-full border border-[#dfe3d9]"
                     >
                       −
                     </button>
                     <span className="min-w-5 text-center text-sm font-semibold">
-                      {item.quantity}
+                      {line.quantity}
                     </span>
                     <button
-                      onClick={() => addToCart(item.id)}
-                      aria-label={`Increase ${item.name} quantity`}
+                      onClick={() => addToCart(line.product.id)}
+                      aria-label={`Increase ${line.product.name} quantity`}
                       className="flex h-7 w-7 items-center justify-center rounded-full border border-[#dfe3d9]"
                     >
                       +
@@ -185,20 +244,20 @@ export default function CartView() {
                   </div>
 
                   <button
-                    onClick={() => removeFromCart(item.id)}
+                    onClick={() => removeFromCart(line.product.id)}
                     className="text-xs font-medium text-red-600 hover:underline"
                   >
                     Remove
                   </button>
 
                   <p className="ml-auto text-sm text-gray-500">
-                    {money(item.price)} each
+                    {money(line.product.price)} each
                   </p>
                 </div>
               </div>
 
               <p className="w-full shrink-0 text-right text-lg font-bold sm:w-auto sm:self-center">
-                {money(item.price * item.quantity)}
+                {money(line.product.price * line.quantity)}
               </p>
             </article>
           ))}
@@ -210,15 +269,15 @@ export default function CartView() {
           <div className="mt-5 space-y-3 border-t border-[#e6e8df] pt-5 text-sm">
             <div className="flex justify-between gap-4">
               <span className="text-gray-500">Subtotal</span>
-              <span className="font-semibold">{money(cartTotal)}</span>
+              <span className="font-semibold">{money(subtotal)}</span>
             </div>
             <div className="flex justify-between gap-4">
               <span className="text-gray-500">Delivery</span>
-              <span className="text-gray-500">Confirmed at checkout</span>
+              <span className="text-gray-500">Agreed with each seller</span>
             </div>
             <div className="flex justify-between gap-4 border-t border-[#e6e8df] pt-4">
               <span className="font-semibold">Total</span>
-              <span className="text-xl font-bold">{money(cartTotal)}</span>
+              <span className="text-xl font-bold">{money(subtotal)}</span>
             </div>
           </div>
 
@@ -230,8 +289,8 @@ export default function CartView() {
           </Link>
 
           <p className="mt-5 text-xs leading-5 text-gray-500">
-            Omni Market does not charge you automatically. Payment and delivery
-            are agreed with each seller.
+            Omni Market does not take payment. You pay the seller directly when
+            you hand over or receive the item.
           </p>
         </aside>
       </div>

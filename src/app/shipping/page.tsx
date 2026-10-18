@@ -8,7 +8,7 @@ import { btnPrimary, shell } from "@/app/ui/styles";
 export const metadata: Metadata = {
   title: "Delivery and pickup",
   description:
-    "How delivery, collection points and handover work on Omni Market, including typical costs and timing across Kenya.",
+    "How delivery, collection points and handover work on Omni Market, including the guidance sellers usually give on timing.",
 };
 
 export default function ShippingPage() {
@@ -17,35 +17,39 @@ export default function ShippingPage() {
       <PageHeader
         kicker="Delivery"
         title="Delivery and pickup options"
-        description="Every listing is handled by an independent seller, so you agree the handover with them. These are the options most buyers and sellers use."
+        description="Every listing is handled by an independent seller, so you agree the handover and the delivery fee with them. These are the two options buyers and sellers usually settle on."
       />
 
       <TextSection title="The two ways to receive an order">
         <Table
-          head={["Option", "How it works", "Typical cost", "Best for"]}
+          head={["Option", "How it works", "Fee", "Best for"]}
           rows={[
             [
               "Rider delivery",
               "The seller hands your item to a rider app or a rider you both agree on; the rider brings it to your address.",
-              "KSh 150 – 400 within a town",
+              "Set by the seller and agreed with you",
               "Bulky items, or when you cannot travel",
             ],
             [
               "Seller pickup",
               "You agree a public collection point and time with the seller and inspect the item there.",
-              "Free",
+              "None",
               "Town centres, campuses, quick handovers",
             ],
           ]}
         />
         <Callout>
-          At checkout Omni Market adds an indicative KSh 300 for rider delivery,
-          or free for pickup. The seller confirms the final amount before you
-          pay — nothing is charged automatically.
+          Delivery is agreed with the seller — sellers set the fee, not Omni
+          Market. Checkout never shows a delivery amount, and nothing is
+          charged automatically.
         </Callout>
       </TextSection>
 
-      <TextSection title="Timing you can plan around">
+      <TextSection title="Timing sellers usually quote">
+        <p>
+          Guidance only, from how riders and buses run between towns. The seller
+          you agree with sets the real date.
+        </p>
         <Table
           head={["Route", "Usual time"]}
           rows={[
@@ -60,9 +64,9 @@ export default function ShippingPage() {
         <BulletList
           items={[
             "Meet in a public place and inspect the item before paying.",
-            "Keep the conversation and payment reference inside the listing so it can be traced.",
-            "Do not send an advance payment to a number that differs from the one on the listing.",
-            "If something is wrong, contact us before the handover closes — see the contact page.",
+            "Keep your own payment reference and order note — Omni Market has no order tracking, so your records are the proof.",
+            "Do not send an advance payment to a number that differs from the one the seller gave you.",
+            "If something is wrong, sort it out with the seller before money changes hands.",
           ]}
         />
       </TextSection>
@@ -70,8 +74,8 @@ export default function ShippingPage() {
       <TextSection title="Frequently asked">
         <BulletList
           items={[
-            "Can I change my address after checkout? Yes, tell the seller in your order notes or a message.",
-            "Who pays for delivery? Buyer and seller agree; most buyers cover rider fees.",
+            "Can I change my address after checkout? Yes — your order is saved on this device, so tell the seller the correct place when you arrange the handover.",
+            "Who pays for delivery? Buyer and seller agree; most buyers cover the rider fee the seller quotes.",
             "Is delivery insured? Rider apps set their own cover. Ask the seller to photograph the sealed package before dispatch.",
           ]}
         />
@@ -82,7 +86,7 @@ export default function ShippingPage() {
           Browse items ready to ship <ArrowRight size={16} />
         </Link>
         <Link href="/contact" className={btnPrimary}>
-          Ask about an order
+          Write to us about a delivery
         </Link>
       </div>
     </main>

@@ -7,7 +7,7 @@ import { shell } from "@/app/ui/styles";
 export const metadata: Metadata = {
   title: "Marketplace rules",
   description:
-    "The rules that keep Omni Market listings accurate, buyers protected and sellers accountable.",
+    "The rules sellers and buyers agree to when listing an item or saving an order on Omni Market.",
 };
 
 export default function TermsPage() {
@@ -41,9 +41,10 @@ export default function TermsPage() {
           ]}
         />
         <Callout>
-          Listings that break these rules are removed and repeat accounts are
-          closed. Law enforcement handles anything criminal — Omni Market does
-          not shield it.
+          There is no moderation queue reading listings before they appear — the
+          shop shows what the seller database holds. Tell us about anything that
+          breaks these rules and we can take the listing out. Law enforcement
+          handles anything criminal; Omni Market does not shield it.
         </Callout>
       </TextSection>
 
@@ -59,20 +60,20 @@ export default function TermsPage() {
       <TextSection title="Conduct">
         <BulletList
           items={[
-            "Reply honestly to buyer questions; do not misrepresent an item.",
-            "No spam, duplicate listings or fake reviews.",
+            "Describe items truthfully; do not misrepresent what a buyer will get.",
+            "No spam or duplicate listings.",
             "Respect the agreed collection point and time, or tell the other party early.",
             "Report anything suspicious through the contact page rather than resolving it in person.",
           ]}
         />
       </TextSection>
 
-      <TextSection title="Disputes">
+      <TextSection title="When something goes wrong">
         <p>
-          Raise the issue with the seller first with photos as evidence. If that
-          does not resolve it, send us the listing reference, order reference and
-          what happened. We can remove listings and close accounts, but we cannot
-          reverse a payment made outside the platform.
+          Omni Market is not a party to the sale. We do not judge disputes, issue
+          refunds or reverse a payment made outside the platform, and orders on
+          this demo are saved only in the buyer&apos;s browser. Raise the problem
+          with the seller first and keep photos and the payment reference.
         </p>
       </TextSection>
 

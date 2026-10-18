@@ -2,7 +2,6 @@
 
 import { useCallback } from "react";
 import { readBrowserList, useBrowserList, writeBrowserList } from "./browser-store";
-import type { CartLine } from "./store";
 
 export type Listing = {
   id: string;
@@ -21,9 +20,11 @@ export type Order = {
   phone: string;
   county: string;
   address: string;
+  method: string;
+  notes: string;
   total: number;
   itemCount: number;
-  status: "Awaiting payment";
+  status: "Recorded, not paid";
   createdAt: string;
 };
 
@@ -42,7 +43,14 @@ function decodeListings(raw: string | null): Listing[] {
 function decodeOrders(raw: string | null): Order[] {
   try {
     const parsed: unknown = JSON.parse(raw ?? "[]");
-    return Array.isArray(parsed) ? (parsed as Order[]) : [];
+    if (!Array.isArray(parsed)) return [];
+
+    return (parsed as Order[]).map((order) => ({
+      ...order,
+      method: typeof order.method === "string" ? order.method : "Agreed with seller",
+      notes: typeof order.notes === "string" ? order.notes : "",
+      status: "Recorded, not paid" as const,
+    }));
   } catch {
     return [];
   }
@@ -87,7 +95,9 @@ export function useOrders() {
       phone: string;
       county: string;
       address: string;
-      lines: CartLine[];
+      method: string;
+      notes: string;
+      itemCount: number;
       total: number;
     }) => {
       const current = readBrowserList<Order>(ORDERS_KEY, decodeOrders);
@@ -97,9 +107,11 @@ export function useOrders() {
         phone: details.phone,
         county: details.county,
         address: details.address,
+        method: details.method,
+        notes: details.notes,
         total: details.total,
-        itemCount: details.lines.reduce((count, line) => count + line.quantity, 0),
-        status: "Awaiting payment",
+        itemCount: details.itemCount,
+        status: "Recorded, not paid",
         createdAt: new Date().toISOString(),
       };
 
@@ -111,10 +123,3 @@ export function useOrders() {
 
   return { orders, placeOrder };
 }
-
-export const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-KE", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });

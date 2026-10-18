@@ -2,20 +2,21 @@
 
 import Link from "next/link";
 import { ArrowRight, ShoppingBag, X } from "lucide-react";
-import { money } from "@/app/lib/catalog";
+import { useCartView } from "@/app/lib/cart";
+import { money } from "@/app/lib/format";
 import { useApp } from "@/app/lib/store";
+import ProductMedia from "./product-media";
 
 export default function CartDrawer() {
   const {
     cartOpen,
     setCartOpen,
-    cartItems,
     cartCount,
-    cartTotal,
     addToCart,
     decreaseQuantity,
     removeFromCart,
   } = useApp();
+  const { lines, itemCount, subtotal, unavailable, sellers, ready } = useCartView();
 
   if (!cartOpen) return null;
 
@@ -40,7 +41,7 @@ export default function CartDrawer() {
               Your shopping bag
             </h2>
             <p className="mt-1 text-sm text-gray-500">
-              {cartCount} item(s) selected
+              {cartCount} item{cartCount === 1 ? "" : "s"} added
             </p>
           </div>
 
@@ -53,7 +54,7 @@ export default function CartDrawer() {
           </button>
         </div>
 
-        {cartItems.length === 0 ? (
+        {cartCount === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
             <ShoppingBag size={42} className="text-[#719267]" />
             <h3 className="mt-4 text-lg font-semibold">Your bag is waiting</h3>
@@ -65,60 +66,94 @@ export default function CartDrawer() {
               onClick={() => setCartOpen(false)}
               className="mt-5 rounded-full bg-[#234b35] px-5 py-3 text-sm font-semibold text-white"
             >
-              Explore products
+              Explore listings
+            </Link>
+          </div>
+        ) : !ready ? (
+          <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
+            <p className="text-sm text-gray-500">
+              Matching your saved ids with live listings...
+            </p>
+            <div className="h-1 w-40 animate-pulse rounded-full bg-[#e6e8df]" />
+          </div>
+        ) : lines.length === 0 ? (
+          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+            <ShoppingBag size={42} className="text-[#719267]" />
+            <h3 className="mt-4 text-lg font-semibold">
+              These listings are no longer live
+            </h3>
+            <p className="mt-2 text-sm text-gray-500">
+              {unavailable} item{unavailable === 1 ? "" : "s"} in your bag point at
+              listings that have been taken down.
+            </p>
+            <Link
+              href="/products"
+              onClick={() => setCartOpen(false)}
+              className="mt-5 rounded-full bg-[#234b35] px-5 py-3 text-sm font-semibold text-white"
+            >
+              Find a replacement
             </Link>
           </div>
         ) : (
           <>
             <div className="flex-1 space-y-5 overflow-y-auto p-5">
-              {cartItems.map((item) => (
+              {unavailable > 0 && (
+                <p className="rounded-2xl bg-[#fdf1f1] px-4 py-3 text-xs text-red-700">
+                  {unavailable} item{unavailable === 1 ? "" : "s"} in your bag is no
+                  longer listed and will not be charged.
+                </p>
+              )}
+
+              {lines.map((line) => (
                 <article
-                  key={item.id}
+                  key={line.product.id}
                   className="flex gap-4 border-b border-[#e6e8df] pb-5"
                 >
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="h-24 w-24 rounded-xl object-cover"
-                  />
+                  <div className="w-24 shrink-0 overflow-hidden rounded-xl">
+                    <ProductMedia
+                      product={line.product}
+                      rounded="rounded-xl"
+                      className="h-24"
+                    />
+                  </div>
 
                   <div className="min-w-0 flex-1">
                     <h3 className="font-semibold">
                       <Link
-                        href={`/products/${item.slug}`}
+                        href={`/products/${line.product.id}`}
                         onClick={() => setCartOpen(false)}
                         className="hover:text-[#234b35]"
                       >
-                        {item.name}
+                        {line.product.name}
                       </Link>
                     </h3>
                     <p className="mt-1 text-sm text-gray-500">
-                      {money(item.price)} each
+                      {money(line.product.price)} each
                     </p>
 
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <button
-                        onClick={() => decreaseQuantity(item.id)}
-                        aria-label={`Decrease ${item.name} quantity`}
+                        onClick={() => decreaseQuantity(line.product.id)}
+                        aria-label={`Decrease ${line.product.name} quantity`}
                         className="flex h-8 w-8 items-center justify-center rounded-full border border-[#dfe3d9]"
                       >
                         −
                       </button>
 
                       <span className="min-w-5 text-center text-sm font-semibold">
-                        {item.quantity}
+                        {line.quantity}
                       </span>
 
                       <button
-                        onClick={() => addToCart(item.id)}
-                        aria-label={`Increase ${item.name} quantity`}
+                        onClick={() => addToCart(line.product.id)}
+                        aria-label={`Increase ${line.product.name} quantity`}
                         className="flex h-8 w-8 items-center justify-center rounded-full border border-[#dfe3d9]"
                       >
                         +
                       </button>
 
                       <button
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => removeFromCart(line.product.id)}
                         className="ml-auto text-xs font-medium text-red-600 hover:underline"
                       >
                         Remove
@@ -127,7 +162,7 @@ export default function CartDrawer() {
                   </div>
 
                   <p className="shrink-0 text-sm font-bold">
-                    {money(item.price * item.quantity)}
+                    {money(line.product.price * line.quantity)}
                   </p>
                 </article>
               ))}
@@ -135,12 +170,15 @@ export default function CartDrawer() {
 
             <div className="border-t border-[#e6e8df] bg-white p-5">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Subtotal</span>
-                <span className="text-xl font-bold">{money(cartTotal)}</span>
+                <span className="text-sm text-gray-600">
+                  Subtotal · {itemCount} item{itemCount === 1 ? "" : "s"} from{" "}
+                  {sellers} seller{sellers === 1 ? "" : "s"}
+                </span>
+                <span className="text-xl font-bold">{money(subtotal)}</span>
               </div>
 
               <p className="mt-2 text-xs text-gray-500">
-                Delivery fees, if applicable, will be calculated at checkout.
+                Delivery fees, if applicable, are agreed with each seller.
               </p>
 
               <Link

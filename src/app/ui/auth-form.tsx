@@ -17,14 +17,14 @@ import {
 
 const perks = {
   login: [
-    "Your bag and favourites follow you",
-    "Message sellers about any listing",
-    "Track orders you have placed",
+    "Real email and password sign-in",
+    "Your bag and favourites stay on this device",
+    "Syncing them to your account is still on the roadmap",
   ],
   register: [
-    "Save favourites and bags in one account",
-    "Publish listings to buyers across Kenya",
-    "Keep your order history in one place",
+    "Creates an email and password account",
+    "Shopping works with or without an account",
+    "No seller profiles or messaging yet",
   ],
 };
 

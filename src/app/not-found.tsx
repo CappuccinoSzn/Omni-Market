@@ -1,7 +1,17 @@
 import Link from "next/link";
 import { ArrowRight, Search } from "lucide-react";
-import { categories } from "@/app/lib/catalog";
 import { btnGhost, btnPrimary, shell } from "@/app/ui/styles";
+
+// Static on purpose: this page renders before any listing data loads, so it
+// must not depend on the Supabase catalog.
+const destinations = [
+  { href: "/categories", label: "All categories" },
+  { href: "/new", label: "New listings" },
+  { href: "/deals", label: "Today's deals" },
+  { href: "/sell", label: "Start selling" },
+  { href: "/help", label: "Help centre" },
+  { href: "/contact", label: "Contact us" },
+];
 
 export default function NotFound() {
   return (
@@ -23,6 +33,9 @@ export default function NotFound() {
           <Link href="/products" className={btnPrimary}>
             Browse all products <ArrowRight size={16} />
           </Link>
+          <Link href="/categories" className={btnGhost}>
+            Browse by category
+          </Link>
           <Link href="/" className={btnGhost}>
             Back to the homepage
           </Link>
@@ -30,20 +43,32 @@ export default function NotFound() {
 
         <div className="mt-10 border-t border-[#e6e8df] pt-8">
           <h2 className="text-sm font-semibold uppercase tracking-[1.5px] text-gray-500">
-            Popular categories
+            Where people were heading
           </h2>
           <div className="mt-4 flex flex-wrap gap-2">
-            {categories.map((category) => (
+            {destinations.map((destination) => (
               <Link
-                key={category.slug}
-                href={`/products?category=${encodeURIComponent(category.name)}`}
+                key={destination.href}
+                href={destination.href}
                 className="rounded-full border border-[#e4e6de] bg-white px-4 py-2.5 text-sm text-gray-600 transition hover:border-[#234b35] hover:text-[#234b35]"
               >
-                {category.emoji} {category.name}
+                {destination.label}
               </Link>
             ))}
           </div>
         </div>
+
+        <p className="mt-8 text-sm leading-7 text-gray-600">
+          Looking for something you saw earlier?{" "}
+          <Link href="/new" className="font-semibold text-[#234b35] hover:underline">
+            New listings
+          </Link>{" "}
+          shows the latest items, and{" "}
+          <Link href="/help" className="font-semibold text-[#234b35] hover:underline">
+            the help centre
+          </Link>{" "}
+          answers most questions about buying and selling.
+        </p>
       </div>
     </main>
   );

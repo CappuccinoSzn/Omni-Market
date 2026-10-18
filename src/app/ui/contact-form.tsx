@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Copy } from "lucide-react";
 import {
   btnGhost,
   btnPrimary,
@@ -14,6 +14,7 @@ import {
 } from "./styles";
 
 const topics = [
+  "Question about a listing",
   "Question about an order",
   "Report a listing",
   "Selling on Omni Market",
@@ -23,10 +24,23 @@ const topics = [
 
 const empty = { name: "", email: "", topic: topics[0], message: "" };
 
-export default function ContactForm() {
-  const [form, setForm] = useState(empty);
+const copyMessages = {
+  idle: "Quote this reference in whatever you send so the note and your listing or order line up.",
+  done: "Copied to your clipboard. Paste it into an email or a message to whoever you are dealing with.",
+  failed: "Your browser blocked the clipboard. Select the text above and copy it manually.",
+};
+
+export default function ContactForm({ about = "" }: { about?: string }) {
+  const [form, setForm] = useState(() => ({
+    ...empty,
+    message: about ? `About "${about}": ` : "",
+  }));
   const [error, setError] = useState("");
   const [reference, setReference] = useState("");
+  const [draft, setDraft] = useState("");
+  const [copyState, setCopyState] = useState<keyof typeof copyMessages>(
+    "idle"
+  );
 
   function update(key: keyof typeof empty, value: string) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -37,16 +51,29 @@ export default function ContactForm() {
     setError("");
 
     if (form.message.trim().length < 15) {
-      setError("Add a little more detail so we can help in one reply.");
+      setError("Add a little more detail so one note is enough.");
       return;
     }
 
-    setReference(`OM-${Math.abs(form.email.length + form.message.length)}-${Date.now().toString().slice(-4)}`);
+    const ref = `OM-${Date.now().toString().slice(-6)}`;
+
+    setDraft(
+      `Omni Market reference ${ref}\nTopic: ${form.topic}\nFrom: ${form.name} <${form.email}>\n\n${form.message.trim()}`
+    );
+    setReference(ref);
+    setCopyState("idle");
     setForm(empty);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  const supportAddress = "support@omnimarket.co.ke";
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(draft);
+      setCopyState("done");
+    } catch {
+      setCopyState("failed");
+    }
+  }
 
   if (reference) {
     return (
@@ -56,25 +83,29 @@ export default function ContactForm() {
         </span>
         <h2 className="mt-4 text-2xl font-semibold">Message ready</h2>
         <p className="mt-2 text-sm leading-6 text-gray-600">
-          Your reference is <strong>{reference}</strong>. The messaging backend is
-          not connected yet, so send the same note to our team and quote the
-          reference — we reply within one working day.
+          Your reference is <strong>{reference}</strong>. This demo does not send
+          anything to a server — no message, no email, no ticket. The note below
+          stays on your device, so copy it and send it however you like.
         </p>
 
-        <div className={`${noticePanel} mt-5`}>
-          <a
-            href={`mailto:${supportAddress}?subject=${encodeURIComponent(
-              `Omni Market ${reference}: ${form.topic || topics[0]}`
-            )}`}
-            className="font-semibold text-[#234b35] hover:underline"
-          >
-            Email {supportAddress}
-          </a>{" "}
-          or call the seller line on +254 700 000 000 (Mon–Sat, 9am–6pm).
-        </div>
+        <label className={`${label} mt-5 block`}>
+          Message to send
+          <textarea
+            readOnly
+            rows={8}
+            value={draft}
+            onFocus={(event) => event.target.select()}
+            className={`${input} resize-y`}
+          />
+        </label>
+
+        <div className={`${noticePanel} mt-5`}>{copyMessages[copyState]}</div>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <button onClick={() => setReference("")} className={btnPrimary}>
+          <button onClick={handleCopy} className={btnPrimary}>
+            <Copy size={16} /> Copy the message
+          </button>
+          <button onClick={() => setReference("")} className={btnGhost}>
             Write another message
           </button>
           <Link href="/help" className={btnGhost}>
@@ -152,7 +183,7 @@ export default function ContactForm() {
           Prepare message <ArrowRight size={16} />
         </button>
         <p className="text-xs text-gray-500">
-          We only use what you send to answer this query.
+          Nothing leaves this browser. You get a reference and a copy of the note.
         </p>
       </div>
     </form>

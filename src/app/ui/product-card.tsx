@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Heart, ShoppingBag } from "lucide-react";
-import { discountPercent, money, type Product } from "@/app/lib/catalog";
+import type { Product } from "@/app/lib/catalog";
+import { discountPercent, money } from "@/app/lib/format";
 import { useApp } from "@/app/lib/store";
+import ProductMedia from "./product-media";
 
 export default function ProductCard({
   product,
@@ -15,6 +17,7 @@ export default function ProductCard({
 }) {
   const { addToCart, favorites, toggleFavorite } = useApp();
   const isFavorite = favorites.includes(product.id);
+  const save = discountPercent(product.price, product.oldPrice);
 
   return (
     <motion.article
@@ -24,20 +27,16 @@ export default function ProductCard({
       transition={{ duration: 0.4, delay: (index % 4) * 0.06 }}
       className="group min-w-0 rounded-[20px] border border-[#e9eae3]/80 bg-white p-2.5 shadow-[0_5px_20px_rgba(28,54,34,0.025)] transition duration-300 hover:-translate-y-1 hover:border-[#d7e0cf] hover:shadow-[0_18px_38px_rgba(28,54,34,0.09)] sm:rounded-[26px] sm:p-3"
     >
-      <div
-        className="relative overflow-hidden rounded-[16px] sm:rounded-[20px]"
-        style={{ backgroundColor: product.color }}
-      >
+      <div className="relative overflow-hidden rounded-[16px] sm:rounded-[20px]">
         <Link
-          href={`/products/${product.slug}`}
+          href={`/products/${product.id}`}
           aria-label={`View details for ${product.name}`}
           className="block w-full overflow-hidden"
         >
-          <img
-            src={product.image}
-            alt={product.name}
-            loading="lazy"
-            className="aspect-[4/4.5] w-full object-cover transition duration-700 ease-out group-hover:scale-105"
+          <ProductMedia
+            product={product}
+            rounded=""
+            className="aspect-[4/4.5] transition duration-700 ease-out group-hover:scale-105"
           />
         </Link>
 
@@ -47,9 +46,9 @@ export default function ProductCard({
           </span>
         )}
 
-        {product.oldPrice && (
+        {save > 0 && (
           <span className="absolute bottom-2 left-2 rounded-full bg-[#234b35] px-2.5 py-1.5 text-[9px] font-semibold text-white shadow-sm sm:left-3 sm:bottom-3 sm:text-[10px]">
-            −{discountPercent(product)}%
+            −{save}%
           </span>
         )}
 
@@ -78,7 +77,7 @@ export default function ProductCard({
       <div className="px-1 pt-3 sm:px-1.5 sm:pt-4">
         <h3 className="text-sm font-semibold leading-snug text-[#26382a] sm:text-base">
           <Link
-            href={`/products/${product.slug}`}
+            href={`/products/${product.id}`}
             className="text-left transition hover:text-[#719267] focus-visible:underline"
           >
             {product.name}
@@ -93,7 +92,7 @@ export default function ProductCard({
           <span className="text-sm font-bold sm:text-base">
             {money(product.price)}
           </span>
-          {product.oldPrice && (
+          {product.oldPrice && product.oldPrice > product.price && (
             <span className="text-[11px] text-gray-400 line-through sm:text-xs">
               {money(product.oldPrice)}
             </span>
@@ -105,11 +104,6 @@ export default function ProductCard({
             {product.seller.charAt(0)}
           </span>
           {product.seller} · {product.location}
-        </p>
-
-        <p className="mt-1 text-[11px] text-gray-500 sm:text-xs">
-          <span className="text-[#7a6a2e]">★</span> {product.rating.toFixed(1)} ·{" "}
-          {product.reviews} ratings
         </p>
       </div>
     </motion.article>

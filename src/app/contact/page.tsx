@@ -1,48 +1,73 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import ContactForm from "@/app/ui/contact-form";
 import PageHeader from "@/app/ui/page-header";
+import { site } from "@/app/lib/site";
 import { card, shell } from "@/app/ui/styles";
 
 export const metadata: Metadata = {
   title: "Contact us",
   description:
-    "Reach the Omni Market team about an order, a listing you want to report, or a question about selling.",
+    "Put together a message about a listing, an order or selling on Omni Market, with a reference you can copy and send.",
 };
 
 const channels = [
   {
-    title: "Email the team",
-    body: "support@omnimarket.co.ke — reply within one working day.",
+    title: "Nothing leaves this browser",
+    body: "This is a demo build. The form does not transmit your message to a server, so keep the reference it gives you and send the note yourself.",
   },
-  {
-    title: "Seller line",
-    body: "+254 700 000 000, Monday to Saturday, 9am to 6pm East Africa Time.",
-  },
+  site.supportEmail
+    ? {
+        title: "Support inbox",
+        body: `Write to ${site.supportEmail}${
+          site.supportPhone ? ` or call ${site.supportPhone}.` : "."
+        }`,
+      }
+    : {
+        title: "No support inbox configured",
+        body: "Omni Market has no support email or phone number for this build. Prepare the note in the form, copy it and send it to whoever you are dealing with.",
+      },
   {
     title: "Report a listing",
-    body: "Pick “Report a listing” in the form and include the listing reference.",
+    body: "Pick “Report a listing” in the form and include the listing number from the product page.",
   },
   {
-    title: "Nairobi office",
-    body: "Visits by appointment only — everything else is handled remotely.",
+    title: "Sellers and handovers",
+    body: "Sellers set the price and the handover. There is no messaging on the site yet, so arrange how you will talk when you first make contact.",
   },
 ];
 
-export default function ContactPage() {
+type AboutParam = Promise<{ about?: string }>;
+
+function FormSkeleton() {
+  return (
+    <div className={`${card} h-[420px] animate-pulse`} aria-label="Loading form" />
+  );
+}
+
+async function ResolvedContactForm({ searchParams }: { searchParams: AboutParam }) {
+  const { about } = await searchParams;
+
+  return <ContactForm about={about ?? ""} />;
+}
+
+export default function ContactPage({ searchParams }: { searchParams: AboutParam }) {
   return (
     <main className={`${shell} py-12 sm:py-16`}>
       <PageHeader
         kicker="Support"
-        title="Talk to the Omni Market team"
-        description="Order trouble, a listing that looks wrong, or a question about selling. Tell us what happened and we will follow up."
+        title="Tell us what happened"
+        description="Order trouble, a listing that looks wrong, or a question about selling. Write it down here and keep the reference — this demo prepares the message but does not transmit it."
       />
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-        <ContactForm />
+        <Suspense fallback={<FormSkeleton />}>
+          <ResolvedContactForm searchParams={searchParams} />
+        </Suspense>
 
         <aside className={`${card} space-y-6`}>
-          <h2 className="text-lg font-semibold">Other ways to reach us</h2>
+          <h2 className="text-lg font-semibold">How this works</h2>
 
           <div className="space-y-5">
             {channels.map((channel) => (

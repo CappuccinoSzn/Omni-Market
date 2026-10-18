@@ -4,10 +4,21 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowRight, Check, Search, ShoppingBag, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  RefreshCw,
+  Search,
+  ShoppingBag,
+  Sparkles,
+} from "lucide-react";
+import { categorySummary, sellerNames, useProducts } from "@/app/lib/catalog";
+import { money } from "@/app/lib/format";
+import ProductMedia from "./product-media";
 
 export default function Hero() {
   const router = useRouter();
+  const { status, products } = useProducts();
   const [term, setTerm] = useState("");
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -15,6 +26,11 @@ export default function Hero() {
     const query = term.trim();
     router.push(query ? `/products?q=${encodeURIComponent(query)}` : "/products");
   }
+
+  const showListings = status === "ready" && products.length > 0;
+  const hero = products[0];
+  const second = products[1];
+  const towns = new Set(products.map((product) => product.location)).size;
 
   return (
     <section className="relative px-4 pb-12 pt-8 sm:px-8 sm:pb-20 sm:pt-12 lg:px-12 lg:pb-24 lg:pt-16">
@@ -27,7 +43,7 @@ export default function Hero() {
         >
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#dfe7d7] bg-white/80 px-4 py-2 text-xs font-semibold text-[#315e43] shadow-sm sm:text-sm">
             <Sparkles size={15} />
-            A little marketplace with big possibilities
+            Live listings from sellers near you
           </div>
 
           <h1 className="max-w-2xl text-[43px] font-semibold leading-[1.02] tracking-[-2.8px] sm:text-6xl lg:text-[78px] lg:tracking-[-4.5px]">
@@ -88,11 +104,11 @@ export default function Hero() {
             </span>
             <span className="flex items-center gap-2">
               <Check size={16} className="text-[#658958]" />
-              Convenient checkout
+              One bag, many sellers
             </span>
             <span className="flex items-center gap-2">
               <Check size={16} className="text-[#658958]" />
-              Made for everyone
+              No listing fees
             </span>
           </div>
         </motion.div>
@@ -108,28 +124,60 @@ export default function Hero() {
 
           <div className="relative grid grid-cols-[1.1fr_0.9fr] gap-3 sm:gap-4">
             <div className="relative mt-10 overflow-hidden rounded-[28px] bg-[#eee6d9] shadow-[0_24px_60px_rgba(33,58,38,0.13)] ring-1 ring-black/[0.03] sm:rounded-[36px]">
-              <img
-                src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=900&q=85"
-                alt="Curated everyday fashion"
-                className="h-[300px] w-full object-cover sm:h-[420px]"
-              />
-              <div className="absolute inset-x-3 bottom-3 rounded-2xl bg-white/90 p-3 backdrop-blur-md sm:inset-x-4 sm:bottom-4 sm:p-4">
-                <p className="text-[10px] font-semibold uppercase tracking-[1.5px] text-gray-500">
-                  Find your style
-                </p>
-                <p className="mt-1 text-sm font-semibold sm:text-base">
-                  Everyday favourites
-                </p>
-              </div>
+              {showListings && hero ? (
+                <Link href={`/products/${hero.id}`} className="block">
+                  <ProductMedia
+                    product={hero}
+                    rounded=""
+                    className="h-[300px] sm:h-[420px]"
+                  />
+                  <div className="absolute inset-x-3 bottom-3 rounded-2xl bg-white/90 p-3 backdrop-blur-md sm:inset-x-4 sm:bottom-4 sm:p-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-[1.5px] text-gray-500">
+                      Just listed · {hero.category}
+                    </p>
+                    <p className="mt-1 truncate text-sm font-semibold sm:text-base">
+                      {hero.name}
+                    </p>
+                    <p className="mt-0.5 text-xs text-[#315e43]">
+                      {money(hero.price)} · {hero.location}
+                    </p>
+                  </div>
+                </Link>
+              ) : (
+                <div className="flex h-[300px] items-center justify-center px-6 text-center sm:h-[420px]">
+                  {status === "error" ? (
+                    <div>
+                      <p className="text-sm font-semibold text-[#234b35]">
+                        Listings are not loading
+                      </p>
+                      <button
+                        onClick={() => router.refresh()}
+                        className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#dfe3d9] bg-white px-4 py-2 text-xs font-semibold text-[#234b35]"
+                      >
+                        <RefreshCw size={14} />
+                        Reload
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="h-full w-full animate-pulse rounded-[28px] bg-[#e6e9df]" />
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col gap-3 sm:gap-4">
               <div className="overflow-hidden rounded-[28px] bg-[#e7e9e0] shadow-[0_18px_45px_rgba(33,58,38,0.10)] ring-1 ring-black/[0.03] sm:rounded-[36px]">
-                <img
-                  src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=700&q=85"
-                  alt="Laptop and technology"
-                  className="h-[175px] w-full object-cover sm:h-[235px]"
-                />
+                {showListings && second ? (
+                  <Link href={`/products/${second.id}`} className="block">
+                    <ProductMedia
+                      product={second}
+                      rounded=""
+                      className="h-[175px] sm:h-[235px]"
+                    />
+                  </Link>
+                ) : (
+                  <div className="h-[175px] animate-pulse bg-[#dfe3d9] sm:h-[235px]" />
+                )}
               </div>
 
               <div className="flex flex-1 flex-col justify-between rounded-[28px] bg-[#234b35] p-5 text-white sm:rounded-[36px] sm:p-7">
@@ -138,18 +186,27 @@ export default function Hero() {
                 </div>
                 <div className="mt-7">
                   <p className="text-xs text-white/70 sm:text-sm">
-                    Your next favourite
+                    On the shelf right now
                   </p>
                   <p className="mt-2 text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
-                    Is waiting
+                    {status === "ready"
+                      ? `${products.length} listings`
+                      : "Loading live count"}
                     <br />
-                    to be found.
+                    {status === "ready"
+                      ? `across ${categorySummary(products).length} categories`
+                      : "from sellers near you"}
+                  </p>
+                  <p className="mt-2 text-xs text-white/60 sm:text-sm">
+                    {status === "ready"
+                      ? `${sellerNames(products).length} sellers · ${towns} ${towns === 1 ? "town" : "towns"}`
+                      : ""}
                   </p>
                   <Link
-                    href="/products"
+                    href="/categories"
                     className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-[#c6dcae] hover:text-white"
                   >
-                    Explore finds <ArrowRight size={16} />
+                    Explore shelves <ArrowRight size={16} />
                   </Link>
                 </div>
               </div>
@@ -160,7 +217,7 @@ export default function Hero() {
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#eaf0e4] text-[#315e43]">
               <ShoppingBag size={14} />
             </span>
-            A better way to discover
+            Prices in Kenyan shillings
           </div>
         </motion.div>
       </div>

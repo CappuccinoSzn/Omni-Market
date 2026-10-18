@@ -30,9 +30,9 @@ export default function PrivacyPage() {
         </p>
         <BulletList
           items={[
-            "Bag contents: product references and quantities.",
-            "Favourites: product references you saved with the heart button.",
-            "Listings and orders: what you submitted through the sell and checkout forms.",
+            "Bag contents: product ids and quantities.",
+            "Favourites: product ids you saved with the heart button.",
+            "Listings and orders: what you typed into the sell and checkout forms.",
           ]}
         />
         <Callout>
@@ -43,9 +43,10 @@ export default function PrivacyPage() {
 
       <TextSection title="What an account holds">
         <p>
-          If you create an account, authentication is handled by Supabase. We
-          store your email address and a hashed password. We do not ask for a
-          phone number, national ID or address to open an account.
+          If you create an account, authentication is handled by Supabase. It
+          keeps your email address, a hashed password and a user id, and we read
+          that id back to sign you in. We do not ask for a phone number, national
+          ID or address to open an account.
         </p>
       </TextSection>
 
@@ -54,16 +55,18 @@ export default function PrivacyPage() {
           items={[
             "No advertising trackers or third-party analytics cookies.",
             "No sale or rental of personal information.",
-            "No payment details collected in the marketplace — payment happens between buyer and seller.",
+            "No payment details collected in the marketplace — nothing on this site is charged to you, and goods are paid for between buyer and seller.",
+            "No sign-in logging, no password reset emails and no support tickets sent from this site.",
           ]}
         />
       </TextSection>
 
       <TextSection title="Delivery and contact information">
         <p>
-          When you place an order, the name, phone number, county and address you
-          enter are shared with the seller so the handover can happen. That is
-          the only time your details leave the marketplace.
+          The name, phone number, county and address you enter at checkout are
+          saved in this browser as an order draft. They are not transmitted to a
+          seller or to us by the site. Handing them over is something you do
+          yourself when you arrange the delivery.
         </p>
       </TextSection>
 
@@ -72,14 +75,15 @@ export default function PrivacyPage() {
           items={[
             "Browse without an account at any time.",
             "Delete individual listings and orders from your dashboard.",
-            "Ask us to delete an account by using the contact page.",
+            "Clear browser storage to wipe bag, favourites, listings and orders.",
+            "Account removal runs through Supabase; this demo has no self-serve delete button.",
           ]}
         />
       </TextSection>
 
       <div className="mt-10 flex flex-wrap gap-3 text-sm">
         <Link href="/contact" className="font-semibold text-[#234b35] underline underline-offset-4">
-          Contact the team
+          Use the contact page
         </Link>
         <Link href="/terms" className="font-semibold text-[#234b35] underline underline-offset-4">
           Read the marketplace rules

@@ -6,7 +6,7 @@ import { shell } from "@/app/ui/styles";
 export const metadata: Metadata = {
   title: "Help centre",
   description:
-    "Answers to the questions buyers and sellers ask most on Omni Market, from checkout to pricing and delivery.",
+    "Answers to the questions buyers and sellers ask on Omni Market, from checkout to pricing and delivery.",
 };
 
 const groups = [
@@ -15,7 +15,7 @@ const groups = [
     items: [
       {
         q: "Do I need an account to buy?",
-        a: "No. You can browse, add to your bag and check out as a guest. An account is useful if you want to publish listings or keep data beyond this device.",
+        a: "No. You can browse, add to your bag and check out as a guest. An account gives you an email and password you can sign back in with, but bag, favourites, listings and orders all live in this browser for now, so an account does not carry them to another device.",
       },
       {
         q: "When do I pay?",
@@ -23,7 +23,7 @@ const groups = [
       },
       {
         q: "Can I see an item before paying?",
-        a: "Yes. Ask the seller for a video call or extra photos, or choose pickup and inspect in person before you pay.",
+        a: "Yes. Choose seller pickup and inspect the item in person before you pay. There is no messaging on the site yet, so you agree the time and place with the seller directly.",
       },
       {
         q: "How do I save something for later?",
@@ -43,8 +43,8 @@ const groups = [
         a: "Search the same category in the shop and compare. Price slightly above what you would accept, because buyers negotiate.",
       },
       {
-        q: "What makes a listing sell faster?",
-        a: "A clear title, honest condition, a list of what is included, and your town. Answer questions the same day if you can.",
+        q: "What makes a listing easier to sell?",
+        a: "A clear title, honest condition, a list of what is included, and your town. Set a price you actually intend to accept.",
       },
       {
         q: "Can I remove a listing?",
@@ -57,7 +57,7 @@ const groups = [
     items: [
       {
         q: "Which option is cheapest?",
-        a: "Seller pickup costs nothing. Rider delivery inside one town is usually KSh 150 to 400 and is confirmed by the seller.",
+        a: "Seller pickup costs nothing. With rider delivery the seller sets the fee, so agree the amount before you pay.",
       },
       {
         q: "Can you deliver outside Kenya?",
@@ -65,7 +65,7 @@ const groups = [
       },
       {
         q: "My item arrived damaged. What now?",
-        a: "Photograph it before paying if possible, tell the seller, then send us the listing and order references through the contact page.",
+        a: "Photograph it before paying if possible and raise it with the seller. Omni Market does not hold funds, so there is no refund or arbitration we can run on your behalf.",
       },
     ],
   },
@@ -74,15 +74,15 @@ const groups = [
     items: [
       {
         q: "I forgot my password.",
-        a: "Use the password reset link Supabase sends when email recovery is configured, or contact us so we can help you regain access.",
+        a: "Password reset emails are not set up on this site yet, so we cannot send you a link. You can register a new account, and the old one stays unused in Supabase.",
       },
       {
         q: "Where is my bag stored?",
         a: "In your browser's local storage on this device. See the privacy policy for exactly which keys we write.",
       },
       {
-        q: "How do I delete my account?",
-        a: "Send a request from the email on your account through the contact page.",
+        q: "How do I delete my data?",
+        a: "Clear your bag, favourites, listings and orders from this browser's storage under the omni-market- keys. Account removal runs through Supabase, not through a support desk.",
       },
     ],
   },
@@ -94,7 +94,7 @@ export default function HelpPage() {
       <PageHeader
         kicker="Help centre"
         title="Answers, without the waiting"
-        description="The questions buyers and sellers ask most. If yours is not here, the contact page reaches a real person."
+        description="The questions buyers and sellers ask most. If yours is not here, the contact page prepares a message you can copy and send yourself."
       />
 
       <div className="mt-8 grid gap-3 sm:grid-cols-3">
@@ -120,9 +120,10 @@ export default function HelpPage() {
           href="/contact"
           className="rounded-2xl border border-[#e6e8df] bg-white p-5 transition hover:-translate-y-1 hover:border-[#cbd7c2]"
         >
-          <p className="text-sm font-semibold">Talk to a person</p>
+          <p className="text-sm font-semibold">Write to us</p>
           <p className="mt-2 text-xs leading-5 text-gray-500">
-            Report a listing, ask about an order or request data deletion.
+            Report a listing or note down a problem, then copy the message and
+            send it yourself.
           </p>
         </Link>
       </div>

@@ -22,9 +22,9 @@ export default function AboutPage() {
 
       <StatGrid
         items={[
-          { value: "47", label: "Counties our sellers ship across" },
-          { value: "1 min", label: "Average time to publish a listing" },
           { value: "0", label: "Listing fees, always" },
+          { value: "Direct", label: "Payment between buyer and seller" },
+          { value: "On device", label: "Bag, favourites and drafts stay with you" },
         ]}
       />
 
@@ -54,10 +54,10 @@ export default function AboutPage() {
       <TextSection title="How buying works">
         <BulletList
           items={[
-            "Browse the shop or search by product, seller or town.",
-            "Open a product page to read condition, highlights and seller details.",
-            "Add to your bag, then confirm delivery details at checkout.",
-            "The seller confirms and you pay at handover by M-Pesa or cash.",
+            "Browse the shop or search by product, category or town.",
+            "Open a product page to read the price, condition, seller and location.",
+            "Add to your bag, then fill in your delivery details at checkout.",
+            "The order is saved on this device, and you pay the seller directly at handover by M-Pesa or cash.",
           ]}
         />
       </TextSection>
@@ -67,7 +67,7 @@ export default function AboutPage() {
           items={[
             "Describe the item honestly, set a price and pick a condition.",
             "Your listing gets a reference number and appears on your dashboard.",
-            "Buyers message you through the listing to agree a handover.",
+            "Agree the handover with the buyer yourself — messaging between buyers and sellers is not part of the site yet.",
             "You get paid when the item changes hands — we take no cut.",
           ]}
         />
@@ -75,8 +75,9 @@ export default function AboutPage() {
 
       <TextSection title="Where we are going">
         <p>
-          Today Omni Market handles discovery, bagging and checkout preparation.
-          Next comes direct seller messaging, online payment through the
+          Today Omni Market handles discovery, bagging and checkout preparation,
+          and keeps your activity in this browser. Next comes direct seller
+          messaging, orders that reach the seller, online payment through the
           marketplace and reviews so buyers can see how a seller performs. We
           build these in the open and ship what buyers and sellers actually ask
           for.

@@ -2,11 +2,22 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, ShoppingBag } from "lucide-react";
-import { money } from "@/app/lib/catalog";
+import { ArrowRight, Check, RefreshCw, ShoppingBag } from "lucide-react";
+import { useCartView } from "@/app/lib/cart";
+import { money } from "@/app/lib/format";
 import { useOrders, type Order } from "@/app/lib/local-data";
+import { loadProducts } from "@/app/lib/catalog";
 import { useApp } from "@/app/lib/store";
-import { btnGhost, btnPrimary, card, eyebrow, input, label, noticePanel } from "./styles";
+import ProductMedia from "./product-media";
+import {
+  btnGhost,
+  btnPrimary,
+  card,
+  eyebrow,
+  input,
+  label,
+  noticePanel,
+} from "./styles";
 
 const counties = [
   "Baringo", "Bomet", "Bungoma", "Busia", "Elgeyo Marakwet", "Embu", "Garissa",
@@ -23,28 +34,29 @@ const deliveryMethods = [
   {
     id: "rider",
     name: "Rider delivery",
-    fee: 300,
-    body: "A rider collects from the seller and brings your order to the address you give.",
+    feeLabel: "Fee set by the seller",
+    body: "A rider collects from the seller and brings your order to the address you give. Agree the fee before payment.",
   },
   {
     id: "pickup",
-    name: "Seller pickup",
-    fee: 0,
-    body: "Agree a collection point with the seller. No delivery fee.",
+    name: "Collection",
+    feeLabel: "Free",
+    body: "Agree a collection point with the seller and pick the item up yourself.",
   },
 ];
 
 const emptyForm = {
   customerName: "",
   phone: "",
-  email: "",
   county: "Nairobi",
   address: "",
   notes: "",
 };
 
 export default function CheckoutView() {
-  const { cartItems, cartTotal, cartCount, clearCart } = useApp();
+  const { cartCount, clearCart } = useApp();
+  const { lines, itemCount, subtotal, unavailable, ready, status, error } =
+    useCartView();
   const { placeOrder } = useOrders();
   const [form, setForm] = useState(emptyForm);
   const [method, setMethod] = useState(deliveryMethods[0].id);
@@ -52,7 +64,6 @@ export default function CheckoutView() {
 
   const selectedMethod =
     deliveryMethods.find((option) => option.id === method) ?? deliveryMethods[0];
-  const total = cartTotal + (cartItems.length > 0 ? selectedMethod.fee : 0);
 
   function update(key: keyof typeof emptyForm, value: string) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -66,12 +77,15 @@ export default function CheckoutView() {
       phone: form.phone,
       county: form.county,
       address: form.address,
-      lines: cartItems,
-      total,
+      method: selectedMethod.name,
+      notes: form.notes,
+      itemCount,
+      total: subtotal,
     });
 
     clearCart();
     setPlaced(order);
+    setForm(emptyForm);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -86,17 +100,26 @@ export default function CheckoutView() {
             Order {placed.id} is recorded
           </h1>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-gray-600">
-            We saved your delivery details with {placed.itemCount} item(s) for{" "}
-            <strong>{money(placed.total)}</strong>. Payment is completed directly
-            with the seller — Omni Market has not charged you anything.
+            We saved {placed.itemCount} item{placed.itemCount === 1 ? "" : "s"} for{" "}
+            <strong>{money(placed.total)}</strong> with your delivery details.
+            Omni Market has not charged you anything and no payment has been made.
           </p>
 
           <div className={`${noticePanel} mt-6 text-left`}>
-            <p className="font-semibold">What happens next</p>
+            <p className="font-semibold">What this record is</p>
             <ol className="mt-3 space-y-2 text-sm">
-              <li>1. The seller reviews your order and confirms the item is ready.</li>
-              <li>2. You agree the final delivery or collection details.</li>
-              <li>3. You pay by M-Pesa or cash when the handover happens.</li>
+              <li>
+                1. It stays in this browser so you can quote the reference when
+                you arrange handover.
+              </li>
+              <li>
+                2. It is not sent to a seller or to our team — the marketplace has
+                no order backend or messaging yet.
+              </li>
+              <li>
+                3. Agree the price, delivery fee and payment with the seller
+                directly, then pay at handover.
+              </li>
             </ol>
           </div>
 
@@ -113,18 +136,55 @@ export default function CheckoutView() {
     );
   }
 
-  if (cartItems.length === 0) {
+  if (status === "error") {
+    return (
+      <main className="mx-auto w-full max-w-[900px] px-4 py-16 sm:px-8 lg:px-12">
+        <div className={noticePanel}>
+          <p className="font-semibold">Checkout cannot price your bag.</p>
+          <p className="mt-1 text-[#40544a]">{error}</p>
+          <button
+            onClick={() => loadProducts(true)}
+            className={`${btnPrimary} mt-4`}
+          >
+            <RefreshCw size={16} />
+            Try again
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  if (!ready) {
+    return (
+      <main className="mx-auto w-full max-w-[900px] px-4 py-16 sm:px-8 lg:px-12">
+        <h1 className="text-3xl font-semibold tracking-tight">Checkout</h1>
+        <p className="mt-2 text-sm text-gray-500">
+          Checking {cartCount} saved item{cartCount === 1 ? "" : "s"} against live
+          listings...
+        </p>
+        <div className="mt-8 h-56 animate-pulse rounded-3xl bg-[#eef1e9]" />
+      </main>
+    );
+  }
+
+  if (lines.length === 0) {
     return (
       <main className="mx-auto w-full max-w-[900px] px-4 py-16 sm:px-8 lg:px-12">
         <div className={`${card} text-center`}>
           <ShoppingBag size={42} className="mx-auto text-[#719267]" />
           <h1 className="mt-5 text-2xl font-semibold">Nothing to check out yet</h1>
           <p className="mx-auto mt-2 max-w-md text-sm text-gray-500">
-            Add products to your bag and they will appear here with delivery
-            options.
+            {unavailable > 0
+              ? `${unavailable} item${unavailable === 1 ? "" : "s"} in your bag point at listings that are no longer published, so there is nothing left to order.`
+              : "Add listings to your bag and they will appear here with delivery options."}
           </p>
+          {unavailable > 0 && (
+            <button onClick={clearCart} className={`${btnGhost} mt-4`}>
+              Clear saved ids
+            </button>
+          )}
           <Link href="/products" className={`${btnPrimary} mt-6`}>
-            Browse products <ArrowRight size={16} />
+            Browse listings <ArrowRight size={16} />
           </Link>
         </div>
       </main>
@@ -143,7 +203,8 @@ export default function CheckoutView() {
           Checkout
         </h1>
         <p className="mt-2 text-sm text-gray-500">
-          Confirm your items and tell the seller where to bring them.
+          Record what you want and where it should go. Nothing is charged and no
+          payment is taken here.
         </p>
       </div>
 
@@ -182,18 +243,6 @@ export default function CheckoutView() {
                   placeholder="0712345678"
                 />
               </label>
-
-              <label className={`${label} sm:col-span-2`}>
-                Email address
-                <input
-                  type="email"
-                  autoComplete="email"
-                  value={form.email}
-                  onChange={(event) => update("email", event.target.value)}
-                  className={input}
-                  placeholder="you@example.com"
-                />
-              </label>
             </div>
           </section>
 
@@ -213,7 +262,7 @@ export default function CheckoutView() {
                   <div className="flex items-center justify-between gap-3">
                     <span className="font-semibold">{option.name}</span>
                     <span className="text-xs font-semibold text-[#315e43]">
-                      {option.fee === 0 ? "Free" : `+ ${money(option.fee)}`}
+                      {option.feeLabel}
                     </span>
                   </div>
                   <input
@@ -264,7 +313,7 @@ export default function CheckoutView() {
               </label>
 
               <label className={`${label} block`}>
-                Notes for the seller (optional)
+                Notes for the handover (optional)
                 <textarea
                   rows={2}
                   value={form.notes}
@@ -279,14 +328,14 @@ export default function CheckoutView() {
           <section className="border-t border-[#e6e8df] pt-6">
             <h2 className="text-lg font-semibold">Payment</h2>
             <p className="mt-2 text-sm leading-6 text-gray-500">
-              Pay the seller by M-Pesa or cash at handover. Online payment
-              processing will be enabled when the order backend is connected —
-              this form does not charge you.
+              Pay the seller by M-Pesa or cash at handover. Omni Market does not
+              process payments, so this form places no charge on you or the
+              seller.
             </p>
           </section>
 
           <button type="submit" className={`${btnPrimary} w-full`}>
-            Place order · {money(total)}
+            Record order · {money(subtotal)}
           </button>
         </form>
 
@@ -294,21 +343,30 @@ export default function CheckoutView() {
           <h2 className="text-lg font-semibold">Your order</h2>
 
           <div className="mt-5 space-y-5">
-            {cartItems.map((item) => (
-              <div key={item.id} className="flex gap-3">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="h-16 w-16 rounded-xl object-cover"
-                />
+            {unavailable > 0 && (
+              <p className="rounded-2xl bg-[#fdf1f1] px-4 py-3 text-xs text-red-700">
+                {unavailable} saved item{unavailable === 1 ? "" : "s"} is no longer
+                listed and is not included.
+              </p>
+            )}
+
+            {lines.map((line) => (
+              <div key={line.product.id} className="flex gap-3">
+                <div className="w-16 shrink-0">
+                  <ProductMedia
+                    product={line.product}
+                    rounded="rounded-xl"
+                    className="h-16"
+                  />
+                </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold">{item.name}</p>
+                  <p className="text-sm font-semibold">{line.product.name}</p>
                   <p className="mt-1 text-xs text-gray-500">
-                    Quantity: {item.quantity} · {item.seller}
+                    Quantity: {line.quantity} · {line.product.seller}
                   </p>
                 </div>
                 <p className="shrink-0 text-sm font-semibold">
-                  {money(item.price * item.quantity)}
+                  {money(line.product.price * line.quantity)}
                 </p>
               </div>
             ))}
@@ -317,25 +375,25 @@ export default function CheckoutView() {
           <div className="mt-6 space-y-3 border-t border-[#e6e8df] pt-5 text-sm">
             <div className="flex justify-between gap-4">
               <span className="text-gray-500">
-                Subtotal ({cartCount} item(s))
+                Subtotal ({itemCount} item{itemCount === 1 ? "" : "s"})
               </span>
-              <span className="font-semibold">{money(cartTotal)}</span>
+              <span className="font-semibold">{money(subtotal)}</span>
             </div>
             <div className="flex justify-between gap-4">
               <span className="text-gray-500">{selectedMethod.name}</span>
-              <span className="font-semibold">
-                {selectedMethod.fee === 0 ? "Free" : money(selectedMethod.fee)}
+              <span className="text-gray-500">
+                {selectedMethod.id === "pickup" ? "Free" : "With seller"}
               </span>
             </div>
             <div className="flex justify-between gap-4 border-t border-[#e6e8df] pt-4">
-              <span className="font-semibold">Total</span>
-              <span className="text-xl font-bold">{money(total)}</span>
+              <span className="font-semibold">Listings total</span>
+              <span className="text-xl font-bold">{money(subtotal)}</span>
             </div>
           </div>
 
           <p className="mt-5 text-xs leading-5 text-gray-500">
-            Check product details and agree delivery with the seller before
-            making payment.
+            Check each listing&rsquo;s price and condition, then agree the final
+            figure with the seller before paying.
           </p>
         </aside>
       </div>

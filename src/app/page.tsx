@@ -6,15 +6,9 @@ import {
   Sparkles,
   Truck,
 } from "lucide-react";
-import {
-  categories,
-  countByCategory,
-  deals,
-  featuredProducts,
-} from "@/app/lib/catalog";
 import Hero from "@/app/ui/hero";
-import ProductCard from "@/app/ui/product-card";
-import { eyebrow, shell } from "@/app/ui/styles";
+import { CategoryStrip, ListingRail } from "@/app/ui/home-sections";
+import { shell } from "@/app/ui/styles";
 
 const trust = [
   {
@@ -25,7 +19,7 @@ const trust = [
   {
     icon: Truck,
     title: "Convenient ordering",
-    body: "Delivery options at checkout",
+    body: "Delivery terms set by each seller",
   },
   {
     icon: ShoppingBag,
@@ -56,98 +50,28 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={`${shell} pb-5 pt-14 sm:pt-20`}>
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className={eyebrow}>Browse your way</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Explore categories
-            </h2>
-            <p className="mt-2 text-sm text-gray-500 sm:text-base">
-              A little something for every part of life.
-            </p>
-          </div>
-          <Link
-            href="/products"
-            className="inline-flex items-center gap-2 rounded-full border border-[#e2e5dc] bg-white px-4 py-2.5 text-sm font-medium transition hover:border-[#234b35] hover:text-[#234b35]"
-          >
-            View all products <ArrowRight size={15} />
-          </Link>
-        </div>
+      <CategoryStrip />
 
-        <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {categories.map((category) => (
-            <Link
-              key={category.slug}
-              href={`/products?category=${encodeURIComponent(category.name)}`}
-              className="group rounded-2xl border border-[#e9eae3] bg-white p-4 shadow-[0_5px_18px_rgba(28,54,34,0.025)] transition duration-300 hover:-translate-y-1 hover:border-[#cbd7c2] hover:shadow-[0_16px_32px_rgba(28,54,34,0.08)] sm:rounded-[22px] sm:p-5"
-            >
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f0f2eb] text-2xl transition group-hover:scale-105">
-                {category.emoji}
-              </span>
-              <span className="mt-4 block text-sm font-semibold">
-                {category.name}
-              </span>
-              <span className="mt-1 block text-xs text-gray-500">
-                {countByCategory(category.name)} live listings
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <ListingRail
+        kind="featured"
+        kicker="Just listed"
+        title="Fresh on the shelf"
+        copy="The newest listings, straight from sellers who published them."
+        href="/new"
+        cta="See new arrivals"
+      />
 
-      <section className={`${shell} pb-14 pt-14 sm:pb-20 sm:pt-20`}>
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className={eyebrow}>Handpicked for you</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Worth a closer look
-            </h2>
-            <p className="mt-2 text-sm text-gray-500 sm:text-base">
-              Fresh finds, good deals and everyday favourites.
-            </p>
-          </div>
-          <Link
-            href="/products"
-            className="inline-flex items-center gap-2 rounded-full border border-[#e2e5dc] bg-white px-4 py-2.5 text-sm font-medium transition hover:border-[#234b35] hover:text-[#234b35]"
-          >
-            Browse the shop <ArrowRight size={15} />
-          </Link>
-        </div>
+      <ListingRail
+        kind="deals"
+        kicker="Save more"
+        title="Priced down by sellers"
+        copy="Listings whose current price is below the price first set."
+        href="/deals"
+        cta="See all deals"
+        limit={3}
+      />
 
-        <div className="mt-7 grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-5 sm:gap-y-9 lg:grid-cols-4">
-          {featuredProducts.slice(0, 4).map((product, index) => (
-            <ProductCard key={product.id} product={product} index={index} />
-          ))}
-        </div>
-      </section>
-
-      <section className={`${shell} pb-14 sm:pb-20`}>
-        <div className="rounded-[28px] border border-[#e6e8df] bg-white p-5 sm:p-8">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className={eyebrow}>Save more</p>
-              <h2 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-                Priced down this week
-              </h2>
-            </div>
-            <Link
-              href="/products?sort=deals"
-              className="text-sm font-semibold text-[#234b35] underline underline-offset-4 hover:text-[#315e43]"
-            >
-              See all deals
-            </Link>
-          </div>
-
-          <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-5 lg:grid-cols-3">
-            {deals.map((product, index) => (
-              <ProductCard key={product.id} product={product} index={index} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className={`${shell} pb-16 sm:pb-24`}>
+      <section className={`${shell} pb-16 pt-14 sm:pb-24`}>
         <div className="relative mx-auto max-w-[1360px] overflow-hidden rounded-[28px] bg-[linear-gradient(120deg,#1d3d2b_0%,#234b35_55%,#355f40_100%)] px-6 py-10 text-white shadow-[0_28px_70px_rgba(35,75,53,0.18)] sm:rounded-[36px] sm:px-12 sm:py-14 lg:px-16 lg:py-16">
           <div className="absolute -right-16 -top-24 h-64 w-64 rounded-full border border-white/10 sm:h-96 sm:w-96" />
           <div className="absolute -right-4 -top-12 h-52 w-52 rounded-full border border-white/10 sm:h-72 sm:w-72" />

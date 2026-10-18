@@ -3,16 +3,26 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
-import { categories, money } from "@/app/lib/catalog";
+import { money } from "@/app/lib/format";
 import { useListings, type Listing } from "@/app/lib/local-data";
 import { useApp } from "@/app/lib/store";
 import { btnGhost, btnPrimary, card, input, label, noticePanel } from "./styles";
 
 const conditions = ["New", "Like new", "Good"];
 
+// "Other" lets a seller list something the current shelves do not cover.
+const categoryNames = [
+  "Electronics",
+  "Fashion",
+  "Home & Living",
+  "Books",
+  "Sports",
+  "Other",
+];
+
 const emptyListing = {
   title: "",
-  category: categories[0].name,
+  category: categoryNames[0],
   condition: conditions[1],
   price: "",
   location: "",
@@ -56,7 +66,7 @@ export default function SellForm() {
           <Check size={22} className="text-[#234b35]" />
         </span>
         <h2 className="mt-4 text-2xl font-semibold">
-          “{created.title}” is listed
+          “{created.title}” is saved
         </h2>
         <p className="mt-2 text-sm text-gray-600">
           Listing reference <strong>{created.id}</strong> · {created.category} ·{" "}
@@ -108,9 +118,9 @@ export default function SellForm() {
             onChange={(event) => update("category", event.target.value)}
             className={input}
           >
-            {categories.map((category) => (
-              <option key={category.slug} value={category.name}>
-                {category.emoji} {category.name}
+            {categoryNames.map((name) => (
+              <option key={name} value={name}>
+                {name}
               </option>
             ))}
           </select>
@@ -183,7 +193,7 @@ export default function SellForm() {
 
       <div className="flex flex-wrap gap-3">
         <button type="submit" className={btnPrimary}>
-          Publish listing <ArrowRight size={16} />
+          Save listing <ArrowRight size={16} />
         </button>
         <Link href="/help" className={btnGhost}>
           Pricing help
@@ -192,11 +202,11 @@ export default function SellForm() {
 
       <p className="text-xs leading-5 text-gray-500">
         By listing an item you confirm you are allowed to sell it and that the
-        description is honest. Prohibited items are removed under our{" "}
+        description is honest. Our{" "}
         <Link href="/terms" className="font-semibold text-[#234b35] hover:underline">
           marketplace rules
-        </Link>
-        .
+        </Link>{" "}
+        explain what cannot be sold.
       </p>
     </form>
   );

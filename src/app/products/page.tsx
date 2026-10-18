@@ -1,12 +1,11 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { categories, products } from "@/app/lib/catalog";
 import Shop from "@/app/ui/shop";
 
 export const metadata: Metadata = {
-  title: "Shop all products",
+  title: "Shop all listings",
   description:
-    "Browse every listing on Omni Market. Filter by category, sort by price and search across sellers in Kenya.",
+    "Browse every live listing on Omni Market. Filter by category, sort by price and search across sellers in Kenya.",
 };
 
 type FilterParams = Promise<{ q?: string; category?: string; sort?: string }>;
@@ -25,8 +24,7 @@ async function ResolvedShop({ searchParams }: { searchParams: FilterParams }) {
   return (
     <Shop
       key={`${q ?? ""}|${category ?? ""}|${sort ?? ""}`}
-      products={products}
-      categories={categories}
+      mode="all"
       initialQuery={q ?? ""}
       initialCategory={category ?? ""}
       initialSort={sort ?? ""}

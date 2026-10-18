@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { categories } from "@/app/lib/catalog";
 
 const columns = [
   {
     title: "Shop",
     links: [
-      { href: "/products", label: "All products" },
+      { href: "/products", label: "All listings" },
+      { href: "/categories", label: "Explore categories" },
+      { href: "/new", label: "New arrivals" },
+      { href: "/deals", label: "Deals & price drops" },
       { href: "/cart", label: "Your bag" },
       { href: "/checkout", label: "Checkout" },
       { href: "/sell", label: "Sell an item" },
@@ -49,13 +51,17 @@ export default function Footer() {
             next favourite thing might be right here.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
-            {categories.map((category) => (
+            {[
+              { href: "/categories", label: "Explore categories" },
+              { href: "/new", label: "Fresh arrivals" },
+              { href: "/deals", label: "Price drops" },
+            ].map((link) => (
               <Link
-                key={category.slug}
-                href={`/products?category=${encodeURIComponent(category.name)}`}
+                key={link.href}
+                href={link.href}
                 className="rounded-full border border-[#e4e6de] bg-white px-3 py-1.5 text-xs text-gray-600 transition hover:border-[#234b35] hover:text-[#234b35]"
               >
-                {category.emoji} {category.name}
+                {link.label}
               </Link>
             ))}
           </div>

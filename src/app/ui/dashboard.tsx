@@ -3,11 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Heart, ShoppingBag, Truck } from "lucide-react";
-import { getProduct, money } from "@/app/lib/catalog";
-import { formatDate, useListings, useOrders } from "@/app/lib/local-data";
+import { useCartView, useFavoriteProducts } from "@/app/lib/cart";
+import { formatDate, money } from "@/app/lib/format";
+import { useListings, useOrders } from "@/app/lib/local-data";
 import { useApp } from "@/app/lib/store";
 import { supabase } from "@/app/lib/supabase";
 import ProductCard from "./product-card";
+import ProductMedia from "./product-media";
 import { btnGhost, btnPrimary, card, eyebrow, noticePanel } from "./styles";
 
 const tabs = [
@@ -21,8 +23,9 @@ const tabs = [
 const tabIds = tabs.map((tab) => tab.id);
 
 export default function Dashboard({ initialTab }: { initialTab: string }) {
-  const { session, authReady, favorites, cartItems, cartTotal, toggleFavorite } =
-    useApp();
+  const { session, authReady, favorites, toggleFavorite } = useApp();
+  const { lines, itemCount, subtotal, ready } = useCartView();
+  const favoriteProducts = useFavoriteProducts();
   const { listings, removeListing } = useListings();
   const { orders } = useOrders();
   const [tab, setTab] = useState(() =>
@@ -37,15 +40,11 @@ export default function Dashboard({ initialTab }: { initialTab: string }) {
     setSigningOut(false);
   }
 
-  const favoriteProducts = favorites
-    .map((id) => getProduct(id))
-    .filter((product): product is NonNullable<typeof product> => product !== null);
-
   const stats = [
     { label: "Saved listings", value: String(listings.length), href: "/dashboard?tab=listings" },
-    { label: "Orders placed", value: String(orders.length), href: "/dashboard?tab=orders" },
+    { label: "Orders recorded", value: String(orders.length), href: "/dashboard?tab=orders" },
     { label: "Favourites", value: String(favoriteProducts.length), href: "/dashboard?tab=favorites" },
-    { label: "Bag value", value: money(cartTotal), href: "/cart" },
+    { label: "Bag value", value: ready ? money(subtotal) : "—", href: "/cart" },
   ];
 
   return (
@@ -54,7 +53,7 @@ export default function Dashboard({ initialTab }: { initialTab: string }) {
         <div>
           <p className={eyebrow}>Your space</p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Seller dashboard
+            Your dashboard
           </h1>
           <p className="mt-2 text-sm text-gray-500">
             {session
@@ -123,35 +122,50 @@ export default function Dashboard({ initialTab }: { initialTab: string }) {
 
             <div className="mt-8 grid gap-6 lg:grid-cols-2">
               <div className={card}>
-                <h2 className="text-lg font-semibold">Recently added to your bag</h2>
-                {cartItems.length === 0 ? (
+                <h2 className="text-lg font-semibold">In your bag</h2>
+                {!ready ? (
+                  <p className="mt-3 text-sm text-gray-500">
+                    Matching saved ids with live listings...
+                  </p>
+                ) : lines.length === 0 ? (
                   <p className="mt-3 text-sm text-gray-500">
                     Your bag is empty.{" "}
-                    <Link href="/products" className="font-semibold text-[#234b35] hover:underline">
-                      Browse products
+                    <Link
+                      href="/products"
+                      className="font-semibold text-[#234b35] hover:underline"
+                    >
+                      Browse listings
                     </Link>
                   </p>
                 ) : (
                   <ul className="mt-4 space-y-3 text-sm">
-                    {cartItems.slice(0, 4).map((item) => (
-                      <li key={item.id} className="flex items-center gap-3">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="h-12 w-12 rounded-xl object-cover"
-                        />
+                    {lines.slice(0, 4).map((line) => (
+                      <li key={line.product.id} className="flex items-center gap-3">
+                        <div className="w-12 shrink-0">
+                          <ProductMedia
+                            product={line.product}
+                            rounded="rounded-xl"
+                            className="h-12"
+                          />
+                        </div>
                         <Link
-                          href={`/products/${item.slug}`}
+                          href={`/products/${line.product.id}`}
                           className="flex-1 font-medium hover:text-[#234b35]"
                         >
-                          {item.name}
+                          {line.product.name}
                         </Link>
-                        <span className="text-gray-500">×{item.quantity}</span>
+                        <span className="text-gray-500">×{line.quantity}</span>
                         <span className="font-semibold">
-                          {money(item.price * item.quantity)}
+                          {money(line.product.price * line.quantity)}
                         </span>
                       </li>
                     ))}
+                    <li className="flex justify-between border-t border-[#e6e8df] pt-3 text-sm">
+                      <span className="text-gray-500">
+                        {itemCount} item{itemCount === 1 ? "" : "s"} in the bag
+                      </span>
+                      <span className="font-semibold">{money(subtotal)}</span>
+                    </li>
                   </ul>
                 )}
                 <Link href="/checkout" className={`${btnPrimary} mt-5`}>
@@ -162,9 +176,9 @@ export default function Dashboard({ initialTab }: { initialTab: string }) {
               <div className={card}>
                 <h2 className="text-lg font-semibold">Next steps for sellers</h2>
                 <ol className="mt-4 space-y-3 text-sm text-gray-600">
-                  <li>1. Add photos and honest details to each listing.</li>
-                  <li>2. Reply to buyer questions within a day.</li>
-                  <li>3. Confirm the handover point before payment.</li>
+                  <li>1. Write an honest title, condition and price.</li>
+                  <li>2. Keep your listing notes clear — there is no in-app chat.</li>
+                  <li>3. Agree the handover point and payment before you travel.</li>
                 </ol>
                 <Link href="/help" className={`${btnGhost} mt-5`}>
                   Read seller guide
@@ -233,8 +247,8 @@ export default function Dashboard({ initialTab }: { initialTab: string }) {
                 <Truck size={36} className="mx-auto text-[#719267]" />
                 <h2 className="mt-4 text-xl font-semibold">No orders yet</h2>
                 <p className="mx-auto mt-2 max-w-sm text-sm text-gray-500">
-                  Orders you place at checkout are listed here with their status
-                  and totals.
+                  Orders you record at checkout are listed here with their totals.
+                  They stay on this device and no payment has been taken.
                 </p>
                 <Link href="/products" className={`${btnPrimary} mt-5`}>
                   Find something to buy
@@ -252,11 +266,17 @@ export default function Dashboard({ initialTab }: { initialTab: string }) {
                         {order.id} · {formatDate(order.createdAt)}
                       </p>
                       <h2 className="mt-2 text-lg font-semibold">
-                        {order.itemCount} item(s) · {order.county}
+                        {order.itemCount} item{order.itemCount === 1 ? "" : "s"} ·{" "}
+                        {order.county}
                       </h2>
                       <p className="mt-1 text-sm text-gray-500">
-                        Delivering to {order.address}
+                        {order.method}: {order.address}
                       </p>
+                      {order.notes && (
+                        <p className="mt-2 text-xs leading-5 text-gray-500">
+                          Notes: {order.notes}
+                        </p>
+                      )}
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold">{money(order.total)}</p>
@@ -273,16 +293,43 @@ export default function Dashboard({ initialTab }: { initialTab: string }) {
 
         {tab === "favorites" && (
           <div>
-            {favoriteProducts.length === 0 ? (
+            {favorites.length === 0 ? (
               <div className={`${card} text-center`}>
                 <Heart size={36} className="mx-auto text-[#719267]" />
                 <h2 className="mt-4 text-xl font-semibold">Nothing saved yet</h2>
                 <p className="mx-auto mt-2 max-w-sm text-sm text-gray-500">
-                  Tap the heart on any product to keep it here for later.
+                  Tap the heart on any listing to keep it here for later.
                 </p>
                 <Link href="/products" className={`${btnPrimary} mt-5`}>
-                  Browse products
+                  Browse listings
                 </Link>
+              </div>
+            ) : !ready ? (
+              <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-5 lg:grid-cols-4">
+                {favorites.slice(0, 4).map((id) => (
+                  <div
+                    key={id}
+                    className="h-[320px] animate-pulse rounded-[26px] bg-[#eef1e9]"
+                  />
+                ))}
+              </div>
+            ) : favoriteProducts.length === 0 ? (
+              <div className={`${card} text-center`}>
+                <Heart size={36} className="mx-auto text-[#719267]" />
+                <h2 className="mt-4 text-xl font-semibold">
+                  Saved listings are no longer live
+                </h2>
+                <p className="mx-auto mt-2 max-w-sm text-sm text-gray-500">
+                  {favorites.length} saved{" "}
+                  {favorites.length === 1 ? "reference" : "references"} do not
+                  match a published listing.
+                </p>
+                <button
+                  onClick={() => favorites.forEach((id) => toggleFavorite(id))}
+                  className={`${btnGhost} mt-5`}
+                >
+                  Clear saved references
+                </button>
               </div>
             ) : (
               <>
@@ -292,7 +339,7 @@ export default function Dashboard({ initialTab }: { initialTab: string }) {
                   ))}
                 </div>
                 <button
-                  onClick={() => favoriteProducts.forEach((product) => toggleFavorite(product.id))}
+                  onClick={() => favorites.forEach((id) => toggleFavorite(id))}
                   className="mt-6 text-xs font-semibold text-gray-500 underline underline-offset-4 hover:text-red-600"
                 >
                   Clear all favourites
@@ -345,7 +392,7 @@ export default function Dashboard({ initialTab }: { initialTab: string }) {
                 <dd className="mt-1 font-semibold">{listings.length}</dd>
               </div>
               <div>
-                <dt className="text-gray-500">Orders placed</dt>
+                <dt className="text-gray-500">Orders recorded</dt>
                 <dd className="mt-1 font-semibold">{orders.length}</dd>
               </div>
               <div>
@@ -354,7 +401,9 @@ export default function Dashboard({ initialTab }: { initialTab: string }) {
               </div>
               <div>
                 <dt className="text-gray-500">Bag value</dt>
-                <dd className="mt-1 font-semibold">{money(cartTotal)}</dd>
+                <dd className="mt-1 font-semibold">
+                  {ready ? money(subtotal) : "Loading"}
+                </dd>
               </div>
             </dl>
           </div>

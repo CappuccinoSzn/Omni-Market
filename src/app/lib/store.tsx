@@ -5,12 +5,10 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { readBrowserList, useBrowserList, writeBrowserList } from "./browser-store";
-import { getProduct, products, type Product } from "./catalog";
 import { supabase } from "./supabase";
 
 const CART_KEY = "omni-market-cart";
@@ -24,10 +22,7 @@ const readIds = (stored: string | null): number[] | null => {
   try {
     const parsed: unknown = JSON.parse(stored);
 
-    if (
-      Array.isArray(parsed) &&
-      parsed.every((id) => typeof id === "number" && getProduct(id))
-    ) {
+    if (Array.isArray(parsed) && parsed.every((id) => typeof id === "number")) {
       return parsed;
     }
   } catch {
@@ -56,14 +51,10 @@ const decodeCart = (raw: string | null) => readWithLegacy(readIds(raw), LEGACY_C
 const decodeFavorites = (raw: string | null) =>
   readWithLegacy(readIds(raw), LEGACY_FAVORITES_KEYS);
 
-export type CartLine = Product & { quantity: number };
-
 type AppValue = {
   cart: number[];
-  cartItems: CartLine[];
   cartCount: number;
-  cartTotal: number;
-  addToCart: (id: number) => void;
+  addToCart: (id: number, quantity?: number) => void;
   decreaseQuantity: (id: number) => void;
   removeFromCart: (id: number) => void;
   clearCart: () => void;
@@ -108,9 +99,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addToCart = useCallback(
-    (id: number) => {
-      writeBrowserList(CART_KEY, [...readBrowserList(CART_KEY, decodeCart), id]);
-      notify("Added to your bag");
+    (id: number, quantity = 1) => {
+      const next = readBrowserList(CART_KEY, decodeCart);
+
+      writeBrowserList(
+        CART_KEY,
+        next.concat(Array.from({ length: quantity }, () => id))
+      );
+      notify(`Added to your bag`);
     },
     [notify]
   );
@@ -146,27 +142,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
-  const cartItems = useMemo(
-    () =>
-      products
-        .map((product) => ({
-          ...product,
-          quantity: cart.filter((id) => id === product.id).length,
-        }))
-        .filter((product) => product.quantity > 0),
-    [cart]
-  );
-
-  const cartTotal = useMemo(
-    () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
-    [cartItems]
-  );
-
   const value: AppValue = {
     cart,
-    cartItems,
     cartCount: cart.length,
-    cartTotal,
     addToCart,
     decreaseQuantity,
     removeFromCart,
