@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { ArrowRight, Check, Copy } from "lucide-react";
 import {
   btnGhost,
@@ -77,18 +78,33 @@ export default function ContactForm({ about = "" }: { about?: string }) {
 
   if (reference) {
     return (
-      <div className={card}>
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#edf2e8]">
-          <Check size={22} className="text-[#234b35]" />
-        </span>
-        <h2 className="mt-4 text-2xl font-semibold">Message ready</h2>
-        <p className="mt-2 text-sm leading-6 text-gray-600">
-          Your reference is <strong>{reference}</strong>. This demo does not send
-          anything to a server — no message, no email, no ticket. The note below
-          stays on your device, so copy it and send it however you like.
+      <div className={`${card} relative overflow-hidden`}>
+        <span className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#234b35] via-[#719477] to-[#c5dba9]" />
+        <motion.span
+          initial={{ scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 320, damping: 18 }}
+          className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2c5c3f] to-[#173624] text-white shadow-[0_14px_30px_rgba(28,64,42,0.28)]"
+        >
+          <Check size={26} strokeWidth={3} />
+        </motion.span>
+        <h2 className="relative mt-5 text-2xl font-semibold tracking-tight sm:text-3xl">
+          Message{" "}
+          <span className="cuk-grad-text font-serif font-normal italic">
+            ready
+          </span>
+        </h2>
+        <p className="relative mt-3 text-sm leading-6 text-gray-600">
+          Your reference is{" "}
+          <span className="rounded-full bg-[#eef4e6] px-2.5 py-1 font-mono text-xs font-bold text-[#234b35]">
+            {reference}
+          </span>
+          . This demo does not send anything to a server — no message, no email,
+          no ticket. The note below stays on your device, so copy it and send it
+          however you like.
         </p>
 
-        <label className={`${label} mt-5 block`}>
+        <label className={`${label} relative mt-5 block`}>
           Message to send
           <textarea
             readOnly
@@ -99,9 +115,11 @@ export default function ContactForm({ about = "" }: { about?: string }) {
           />
         </label>
 
-        <div className={`${noticePanel} mt-5`}>{copyMessages[copyState]}</div>
+        <div className={`${noticePanel} relative mt-5`}>
+          {copyMessages[copyState]}
+        </div>
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="relative mt-6 flex flex-wrap gap-3">
           <button onClick={handleCopy} className={btnPrimary}>
             <Copy size={16} /> Copy the message
           </button>
@@ -117,8 +135,13 @@ export default function ContactForm({ about = "" }: { about?: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className={`${card} space-y-5`}>
-      <div className="grid gap-4 sm:grid-cols-2">
+    <form
+      onSubmit={handleSubmit}
+      className={`${card} relative space-y-6 overflow-hidden`}
+    >
+      <span className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#234b35] via-[#719477] to-[#c5dba9]" />
+
+      <div className="relative grid gap-4 sm:grid-cols-2">
         <label className={label}>
           Your name *
           <input
@@ -144,20 +167,36 @@ export default function ContactForm({ about = "" }: { about?: string }) {
           />
         </label>
 
-        <label className={`${label} block sm:col-span-2`}>
-          What is it about?
-          <select
-            value={form.topic}
-            onChange={(event) => update("topic", event.target.value)}
-            className={input}
-          >
-            {topics.map((topic) => (
-              <option key={topic} value={topic}>
-                {topic}
-              </option>
-            ))}
-          </select>
-        </label>
+        <fieldset className="sm:col-span-2">
+          <legend className={label}>What is it about?</legend>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {topics.map((topic) => {
+              const active = form.topic === topic;
+
+              return (
+                <label key={topic} className="cursor-pointer">
+                  <input
+                    type="radio"
+                    name="contact-topic"
+                    value={topic}
+                    checked={active}
+                    onChange={() => update("topic", topic)}
+                    className="sr-only"
+                  />
+                  <span
+                    className={`inline-flex items-center rounded-full px-3.5 py-2.5 text-xs font-semibold transition duration-200 active:scale-[0.97] sm:text-sm ${
+                      active
+                        ? "bg-gradient-to-br from-[#2c5c3f] to-[#173624] text-white shadow-[0_10px_22px_rgba(28,64,42,0.20)]"
+                        : "border border-[#e2e7dc] bg-white text-gray-600 hover:-translate-y-0.5 hover:border-[#a8c199] hover:text-[#234b35]"
+                    }`}
+                  >
+                    {topic}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
 
         <label className={`${label} block sm:col-span-2`}>
           Message *
@@ -173,16 +212,17 @@ export default function ContactForm({ about = "" }: { about?: string }) {
       </div>
 
       {error && (
-        <p role="alert" className={fieldError}>
+        <p role="alert" className={`${fieldError} relative`}>
           {error}
         </p>
       )}
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="relative flex flex-wrap items-center gap-3">
         <button type="submit" className={btnPrimary}>
           Prepare message <ArrowRight size={16} />
         </button>
-        <p className="text-xs text-gray-500">
+        <p className="flex items-center gap-2 text-xs text-gray-500">
+          <span className="cuk-live-dot" aria-hidden />
           Nothing leaves this browser. You get a reference and a copy of the note.
         </p>
       </div>

@@ -89,9 +89,12 @@ export default function Header() {
 
   return (
     <>
-      <div className="bg-[#1d3d2b] px-4 py-2.5 text-center text-[11px] font-semibold tracking-wide text-white sm:text-xs">
-        Your next great find is closer than you think.
-        <span className="ml-2 hidden sm:inline">
+      <div className="relative overflow-hidden bg-gradient-to-r from-[#173624] via-[#234b35] to-[#2f6b46] px-4 py-2.5 text-center text-[11px] font-semibold tracking-wide text-white sm:text-xs">
+        <span className="mr-2 inline-flex items-center gap-2">
+          <span className="cuk-live-dot h-1.5 w-1.5" aria-hidden />
+          Your next great find is closer than you think.
+        </span>
+        <span className="ml-2 hidden text-[#c5dba9] sm:inline">
           A better way to buy, sell and discover.
         </span>
       </div>
@@ -101,7 +104,7 @@ export default function Header() {
             right edge of the viewport instead of a centred column. */}
         <div className="flex w-full items-center gap-3 px-3 py-3 sm:gap-4 sm:px-5 sm:py-3.5">
           <Link href="/" className="shrink-0">
-            <span className="block text-[22px] font-black tracking-[-1.6px] text-[#234b35] lg:text-3xl">
+            <span className="block bg-gradient-to-r from-[#234b35] via-[#3f7a55] to-[#7fae6d] bg-clip-text text-[22px] font-black tracking-[-1.6px] text-transparent lg:text-3xl">
               Omni<span className="text-[#a2bd70]">.</span>Market
             </span>
             <span className="mt-0.5 hidden text-[9px] font-semibold uppercase tracking-[2px] text-gray-500 sm:block">
@@ -157,7 +160,10 @@ export default function Header() {
             >
               <ShoppingBag size={19} />
               {cartCount > 0 && (
-                <span className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#a2bd70] px-1 text-[10px] font-bold text-[#203a28]">
+                <span
+                  key={cartCount}
+                  className="cuk-pop absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#c5dba9] to-[#8fb266] px-1 text-[10px] font-bold text-[#203a28] shadow-[0_3px_10px_rgba(35,75,53,0.25)]"
+                >
                   {cartCount}
                 </span>
               )}

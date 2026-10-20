@@ -2,7 +2,15 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Heart, RefreshCw, Search, SlidersHorizontal } from "lucide-react";
+import {
+  ArrowRight,
+  BadgePercent,
+  Heart,
+  PlugZap,
+  RefreshCw,
+  Search,
+  SlidersHorizontal,
+} from "lucide-react";
 import {
   categorySummary,
   dealProducts,
@@ -13,7 +21,7 @@ import {
 import { discountPercent } from "@/app/lib/format";
 import { useApp } from "@/app/lib/store";
 import ProductCard from "./product-card";
-import { btnGhost, btnPrimary, card, eyebrow, noticePanel, shell } from "./styles";
+import { btnGhost, btnPrimary, kicker, panelDark, shell } from "./styles";
 
 const sorts = [
   { value: "featured", label: "Newest first" },
@@ -29,16 +37,19 @@ const headlines = {
   all: {
     kicker: "The full shelf",
     title: "Shop all listings",
+    accent: "listings",
     copy: "Search, filter and sort every listing sellers have published on Omni Market.",
   },
   new: {
     kicker: "Just listed",
     title: "Fresh arrivals",
+    accent: "arrivals",
     copy: "The newest listings, most recent first, straight from the sellers' shelf.",
   },
   deals: {
     kicker: "Price drops",
     title: "Deals and reductions",
+    accent: "reductions",
     copy: "Listings whose current price is below the price the seller first set.",
   },
 } as const;
@@ -133,28 +144,49 @@ export default function Shop({
     favoritesOnly ||
     sort !== "";
 
+  const titleWords = headline.title.split(" ");
+  const titleTail = titleWords.slice(-1)[0];
+  const titleHead = titleWords.slice(0, -1).join(" ");
+
   return (
-    <main className={`${shell} py-12 sm:py-16`}>
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <main className={`${shell} relative py-12 sm:py-16`}>
+      <span
+        className="cuk-blob right-[-8%] top-0 h-[260px] w-[260px] opacity-30"
+        style={{ background: mode === "deals" ? "#f0b429" : "#9ec77f" }}
+        aria-hidden
+      />
+
+      <div className="relative flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className={eyebrow}>{headline.kicker}</p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
-            {headline.title}
+          <p className={kicker}>
+            <span className="cuk-live-dot" aria-hidden />
+            {headline.kicker}
+          </p>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+            {titleHead}{" "}
+            <span className="cuk-grad-text font-serif font-normal italic">
+              {titleTail}
+            </span>
           </h1>
-          <p className="mt-2 text-sm text-gray-500 sm:text-base">{headline.copy}</p>
+          <p className="mt-3 text-sm text-gray-500 sm:text-base">{headline.copy}</p>
         </div>
         <Link href="/sell" className={btnGhost}>
-          List an item
+          List an item <ArrowRight size={15} />
         </Link>
       </div>
 
       {status === "error" && (
-        <div className={`${noticePanel} mt-8`}>
-          <p className="font-semibold">Live listings could not be loaded.</p>
-          <p className="mt-1 text-[#40544a]">{error}</p>
+        <div className="relative mx-auto mt-9 max-w-xl rounded-[28px] border border-[#e6d9bd] bg-gradient-to-br from-[#fdf7ea] to-white p-7 text-center shadow-[0_18px_46px_rgba(28,54,34,0.08)]">
+          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#f0b429] to-[#dd7a55] text-white shadow-[0_12px_26px_rgba(221,122,85,0.3)]">
+            <PlugZap size={26} />
+          </span>
+          <p className="mt-5 text-lg font-semibold">
+            Live listings could not be loaded.
+          </p>
+          <p className="mt-1 text-sm text-[#40544a]">{error}</p>
           <button
             onClick={() => loadProducts(true)}
-            className={`${btnPrimary} mt-4`}
+            className={`${btnPrimary} mt-5`}
           >
             <RefreshCw size={16} />
             Try again
@@ -165,34 +197,34 @@ export default function Shop({
       {status === "loading" && (
         <>
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
-            <div className="h-[50px] animate-pulse rounded-full bg-[#eef1e9]" />
-            <div className="h-[50px] animate-pulse rounded-full bg-[#eef1e9]" />
+            <div className="cuk-skeleton h-[52px] rounded-full" />
+            <div className="cuk-skeleton h-[52px] rounded-full" />
           </div>
           <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-5 sm:gap-y-9 lg:grid-cols-4">
             {Array.from({ length: 8 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-[320px] animate-pulse rounded-[26px] bg-[#eef1e9]"
-              />
+              <div key={index} className="cuk-skeleton h-[320px] rounded-[26px]" />
             ))}
           </div>
         </>
       )}
 
       {status === "ready" && base.length === 0 && (
-        <div className={`${card} mt-8 text-center`}>
-          <h2 className="text-lg font-semibold">
+        <div className="mt-9 rounded-[28px] border border-dashed border-[#cfd9c4] bg-gradient-to-br from-[#f2f7ec] to-white px-6 py-14 text-center">
+          <span className="cuk-float mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-3xl shadow-[0_12px_30px_rgba(28,54,34,0.10)]">
+            {mode === "deals" ? "🏷️" : "🧺"}
+          </span>
+          <h2 className="mt-5 text-2xl font-semibold tracking-tight text-[#234b35]">
             {mode === "deals"
               ? "No reduced listings right now"
               : "No active listings yet"}
           </h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-gray-500">
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500">
             {mode === "deals"
               ? "Every active listing is at the price the seller first set. Check back after the next price drop."
               : "Sellers have not published a listing that matches this page. Be the first to add one."}
           </p>
-          <Link href="/sell" className={`${btnPrimary} mt-5`}>
-            Start selling
+          <Link href="/sell" className={`${btnPrimary} mt-6`}>
+            Start selling <ArrowRight size={15} />
           </Link>
         </div>
       )}
@@ -200,8 +232,10 @@ export default function Shop({
       {status === "ready" && base.length > 0 && (
         <>
           <div className="mt-8 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
-            <label className="flex items-center gap-2 rounded-full border border-[#e2e7dc] bg-white px-4 py-3 shadow-sm focus-within:border-[#719477]">
-              <Search size={18} className="shrink-0 text-gray-400" />
+            <label className="group flex items-center gap-2 rounded-full border border-[#dfe6d6] bg-white/95 px-3 py-2.5 shadow-[0_6px_20px_rgba(28,54,34,0.05)] transition focus-within:border-[#8fae86] focus-within:shadow-[0_0_0_4px_rgba(162,189,112,0.18)]">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#eaf2e0] to-[#f7f9f1] text-[#315e43] transition group-focus-within:scale-105">
+                <Search size={17} />
+              </span>
               <input
                 value={query}
                 onChange={(event) => {
@@ -210,12 +244,24 @@ export default function Shop({
                 }}
                 placeholder="Search products, sellers or towns..."
                 aria-label="Search products"
-                className="w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
+                className="w-full bg-transparent py-1.5 text-sm outline-none placeholder:text-gray-400"
               />
+              {query !== "" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery("");
+                    updateUrl({ q: "" });
+                  }}
+                  className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-semibold text-[#315e43] transition hover:bg-[#eef4e6]"
+                >
+                  Clear
+                </button>
+              )}
             </label>
 
-            <label className="flex items-center gap-2 rounded-full border border-[#e4e6de] bg-white px-4 py-3 text-sm text-gray-600">
-              <SlidersHorizontal size={16} />
+            <label className="flex items-center gap-2 rounded-full border border-[#dfe6d6] bg-white/95 px-4 py-2.5 text-sm text-gray-600 shadow-[0_6px_20px_rgba(28,54,34,0.05)] transition focus-within:border-[#8fae86] focus-within:shadow-[0_0_0_4px_rgba(162,189,112,0.18)]">
+              <SlidersHorizontal size={16} className="text-[#315e43]" />
               Sort
               <select
                 aria-label="Sort products"
@@ -224,7 +270,7 @@ export default function Shop({
                   setSort(event.target.value);
                   updateUrl({ sort: event.target.value });
                 }}
-                className="max-w-[170px] bg-transparent font-semibold text-[#26382a] outline-none"
+                className="max-w-[170px] bg-transparent py-1 font-semibold text-[#26382a] outline-none"
               >
                 {sorts.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -237,42 +283,52 @@ export default function Shop({
 
           {mode !== "deals" && (
             <div
-              className="mt-5 flex gap-2 overflow-x-auto pb-2"
+              className="mt-5 flex flex-wrap gap-2"
               aria-label="Filter by category"
             >
-              {["All items", ...categories.map((item) => item.name)].map((name) => (
-                <button
-                  key={name}
-                  onClick={() => {
-                    setCategory(name);
-                    updateUrl({ category: name });
-                  }}
-                  className={`shrink-0 rounded-full px-4 py-2.5 text-xs font-medium transition sm:text-sm ${
-                    activeCategory === name
-                      ? "bg-[#234b35] text-white"
-                      : "border border-[#e4e6de] bg-white text-gray-600 hover:border-[#234b35] hover:text-[#234b35]"
-                  }`}
-                >
-                  {name}
-                  <span
-                    className={`ml-2 text-[10px] ${
-                      activeCategory === name ? "text-white/70" : "text-gray-400"
+                {["All items", ...categories.map((item) => item.name)].map((name) => (
+                  <button
+                    key={name}
+                    onClick={() => {
+                      setCategory(name);
+                      updateUrl({ category: name });
+                    }}
+                    className={`shrink-0 rounded-full px-4 py-2.5 text-xs font-semibold transition duration-200 active:scale-[0.97] sm:text-sm ${
+                      activeCategory === name
+                        ? "bg-gradient-to-br from-[#2c5c3f] to-[#173624] text-white shadow-[0_10px_24px_rgba(28,64,42,0.24)]"
+                        : "border border-[#e2e7dc] bg-white/90 text-gray-600 hover:-translate-y-0.5 hover:border-[#a8c199] hover:text-[#234b35] hover:shadow-[0_8px_18px_rgba(28,54,34,0.07)]"
                     }`}
                   >
-                    {name === "All items"
-                      ? base.length
-                      : categories.find((item) => item.name === name)?.count ?? 0}
-                  </span>
-                </button>
-              ))}
+                    {name}
+                    <span
+                      className={`ml-2 rounded-full px-1.5 py-0.5 text-[10px] ${
+                        activeCategory === name
+                          ? "bg-white/20 text-white"
+                          : "bg-[#eef4e6] text-[#3f5a46]"
+                      }`}
+                    >
+                      {name === "All items"
+                        ? base.length
+                        : categories.find((item) => item.name === name)?.count ?? 0}
+                    </span>
+                  </button>
+                ))}
             </div>
           )}
 
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-xs text-gray-500" aria-live="polite">
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+            <p
+              className="inline-flex items-center gap-2 rounded-full border border-[#e2e7dc] bg-white/85 px-3 py-2 text-[11px] font-semibold text-[#3f5a46] shadow-[0_2px_10px_rgba(28,54,34,0.04)] sm:text-xs"
+              aria-live="polite"
+            >
+              <span className="cuk-live-dot" aria-hidden />
+              {mode === "deals" && (
+                <BadgePercent size={13} className="text-[#dd7a55]" aria-hidden />
+              )}
               Showing{" "}
-              <span className="font-semibold text-[#26382a]">{visible.length}</span> of{" "}
-              {favoritesOnly ? favorites.length : base.length} {mode === "deals" ? "deals" : "listings"}
+              <span className="text-[#1f4531]">{visible.length}</span> of{" "}
+              {favoritesOnly ? favorites.length : base.length}{" "}
+              {mode === "deals" ? "deals" : "listings"}
               {activeCategory !== "All items" && ` in ${activeCategory}`}
             </p>
 
@@ -280,10 +336,10 @@ export default function Shop({
               <button
                 onClick={() => setFavoritesOnly((value) => !value)}
                 aria-pressed={favoritesOnly}
-                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-xs font-semibold transition sm:text-sm ${
+                className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold transition duration-200 active:scale-[0.97] sm:text-sm ${
                   favoritesOnly
-                    ? "border-[#234b35] bg-[#234b35] text-white"
-                    : "border-[#e4e6de] bg-white text-gray-600 hover:border-[#234b35]"
+                    ? "bg-gradient-to-br from-[#dd7a55] to-[#c25a38] text-white shadow-[0_10px_24px_rgba(194,90,56,0.26)]"
+                    : "border border-[#e2e7dc] bg-white/90 text-gray-600 hover:-translate-y-0.5 hover:border-[#dd7a55] hover:text-[#c25a38]"
                 }`}
               >
                 <Heart size={15} fill={favoritesOnly ? "currentColor" : "none"} />
@@ -293,7 +349,7 @@ export default function Shop({
               {hasFilters && (
                 <button
                   onClick={reset}
-                  className="rounded-full px-3 py-2 text-xs font-semibold text-[#315e43] underline underline-offset-4"
+                  className="rounded-full border border-[#e2e7dc] bg-white/70 px-4 py-2.5 text-xs font-semibold text-[#315e43] transition hover:border-[#8fae86] hover:bg-[#f4f8ef] sm:text-sm"
                 >
                   Reset filters
                 </button>
@@ -308,19 +364,21 @@ export default function Shop({
               ))}
             </div>
           ) : (
-            <div className="mt-8 rounded-3xl border border-dashed border-[#dfe3d9] bg-white/70 px-5 py-16 text-center">
-              <Search className="mx-auto text-gray-400" size={30} />
-              <h2 className="mt-4 text-lg font-semibold">
+            <div className="mt-8 rounded-[28px] border border-dashed border-[#cfd9c4] bg-gradient-to-br from-white/80 to-[#f2f7ec] px-5 py-16 text-center">
+              <span className="cuk-float mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-[#719267] shadow-[0_12px_30px_rgba(28,54,34,0.10)]">
+                <Search size={28} />
+              </span>
+              <h2 className="mt-5 text-xl font-semibold tracking-tight text-[#234b35] sm:text-2xl">
                 {favoritesOnly && favorites.length === 0
                   ? "No favourites saved yet"
                   : "No matching listings found"}
               </h2>
-              <p className="mt-2 text-sm text-gray-500">
+              <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-gray-500">
                 {favoritesOnly
                   ? "Tap the heart on any listing to save it here."
                   : "Try a different keyword, category or sort option."}
               </p>
-              <button onClick={reset} className={`${btnPrimary} mt-5`}>
+              <button onClick={reset} className={`${btnPrimary} mt-6`}>
                 Clear filters
               </button>
             </div>
@@ -328,17 +386,29 @@ export default function Shop({
         </>
       )}
 
-      <div className="mt-12 rounded-3xl bg-[#edf2e8] px-5 py-8 text-center sm:px-8">
-        <h2 className="text-xl font-semibold text-[#234b35] sm:text-2xl">
-          Selling something good?
-        </h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-[#40544a]">
-          Add a title, an honest condition and a fair price, and your listing
-          joins this shelf.
-        </p>
-        <Link href="/sell" className={`${btnPrimary} mt-5`}>
-          Start selling
-        </Link>
+      <div className={`${panelDark} mt-12 px-6 py-10 text-center sm:px-10 sm:py-12`}>
+        <span className="cuk-dots absolute inset-0 text-white" aria-hidden />
+        <span
+          className="cuk-blob right-[10%] top-[-40%] h-[230px] w-[230px] opacity-25"
+          style={{ background: "#9ec77f" }}
+          aria-hidden
+        />
+        <div className="relative">
+          <h2 className="text-xl font-semibold sm:text-3xl">
+            Selling something good?
+          </h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-white/75">
+            Add a title, an honest condition and a fair price, and your listing
+            joins this shelf.
+          </p>
+          <Link
+            href="/sell"
+            className="group mt-6 inline-flex items-center gap-3 rounded-full bg-[#c5dba9] px-6 py-3.5 text-sm font-semibold text-[#234b35] shadow-[0_14px_32px_rgba(197,219,169,0.26)] transition hover:-translate-y-1 hover:bg-white active:translate-y-0"
+          >
+            Start selling
+            <ArrowRight size={16} className="transition group-hover:translate-x-1" />
+          </Link>
+        </div>
       </div>
     </main>
   );

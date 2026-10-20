@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import { supabase } from "@/app/lib/supabase";
 import {
   btnGhost,
@@ -11,8 +11,11 @@ import {
   card,
   fieldError,
   input,
+  kicker,
   label,
   noticePanel,
+  panelDark,
+  rule,
 } from "./styles";
 
 const perks = {
@@ -92,11 +95,33 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:gap-12">
-      <div className={`${card} max-w-xl`}>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          {isRegister ? "Create your account" : "Welcome back"}
-        </h1>
-        <p className="mt-2 text-sm text-gray-500">
+      <div className={`${card} relative max-w-xl overflow-hidden`}>
+        <span className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#234b35] via-[#719477] to-[#c5dba9]" />
+        <div className="relative">
+          <p className={kicker}>
+            <span className="cuk-live-dot" aria-hidden />
+            {isRegister ? "Two minutes, no fees" : "Welcome back"}
+          </p>
+          <h1 className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+            {isRegister ? (
+              <>
+                Create your{" "}
+                <span className="cuk-grad-text font-serif font-normal italic">
+                  account
+                </span>
+              </>
+            ) : (
+              <>
+                Sign in to{" "}
+                <span className="cuk-grad-text font-serif font-normal italic">
+                  Omni Market
+                </span>
+              </>
+            )}
+          </h1>
+          <div className={rule} />
+        </div>
+        <p className="mt-4 text-sm text-gray-500">
           {isRegister
             ? "One account for buying, selling and saved finds."
             : "Sign in to reach your bag, favourites and listings."}
@@ -132,7 +157,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
                 <button
                   type="button"
                   onClick={() => setShowPassword((value) => !value)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#234b35]"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-[#f2f7ec] px-3 py-1.5 text-[11px] font-semibold text-[#234b35] transition hover:bg-[#e4eed7]"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -200,25 +225,38 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
       </div>
 
       <aside className="space-y-5">
-        <div className="rounded-3xl bg-[#234b35] p-6 text-white">
-          <h2 className="text-lg font-semibold">
-            {isRegister ? "What you get" : "Good to see you"}
-          </h2>
-          <ul className="mt-4 space-y-3 text-sm text-white/80">
-            {perks[mode].map((perk) => (
-              <li key={perk} className="flex gap-2">
-                <ArrowRight size={16} className="mt-0.5 shrink-0 text-[#c5dba9]" />
-                {perk}
-              </li>
-            ))}
-          </ul>
+        <div className={`${panelDark} p-6`}>
+          <span className="cuk-dots absolute inset-0 text-white" aria-hidden />
+          <span
+            className="cuk-blob right-[-12%] top-[-45%] h-[180px] w-[180px] opacity-25"
+            style={{ background: "#9ec77f" }}
+            aria-hidden
+          />
+          <div className="relative">
+            <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[1.6px] text-[#d5e4c8] ring-1 ring-white/15">
+              <span className="cuk-live-dot" aria-hidden />
+              {isRegister ? "What you get" : "Good to see you"}
+            </p>
+            <ul className="mt-4 space-y-3 text-sm leading-6 text-white/80">
+              {perks[mode].map((perk) => (
+                <li key={perk} className="flex gap-3">
+                  <ArrowRight
+                    size={16}
+                    className="mt-0.5 shrink-0 text-[#c5dba9]"
+                  />
+                  {perk}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        <div className="rounded-3xl border border-[#e6e8df] bg-white p-6 text-sm text-gray-600">
-          <h2 className="text-base font-semibold text-[#26382a]">
+        <div className="rounded-3xl border border-[#e6e9dd] bg-gradient-to-br from-white to-[#fafcf6] p-6 text-sm leading-6 text-gray-600 shadow-[0_8px_26px_rgba(28,54,34,0.05)] transition duration-300 hover:border-[#c7d8b8] hover:shadow-[0_18px_38px_rgba(28,54,34,0.10)]">
+          <h2 className="flex items-center gap-2 text-base font-semibold text-[#26382a]">
+            <ShieldCheck size={16} className="text-[#658958]" />
             Your data, your control
           </h2>
-          <p className="mt-2 leading-6">
+          <p className="mt-2">
             Omni Market keeps shopping data on your device by default. Read how
             we handle information in the{" "}
             <Link href="/privacy" className="font-semibold text-[#234b35] hover:underline">

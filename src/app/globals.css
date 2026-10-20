@@ -3,11 +3,21 @@
 :root {
   color-scheme: light;
   background: #fcfcf9;
-  color: #202a22;
+  color: #13d53a;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --ink: #1b2f22;
+  --moss: #234b35;
+  --moss-soft: #315e43;
+  --lime: #a2bd70;
+  --lime-bright: #c5dba9;
+  --sun: #f0b429;
+  --clay: #dd7a55;
+  --sky: #6fa8c9;
+  --cream: #fcfcf9;
 }
 
 * {
@@ -22,13 +32,12 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(
-      ellipse at top,
-      #f0f5e9 0%,
-      #fcfcf9 38%,
-      #fcfcf9 100%
-    )
-    no-repeat;
+  background-color: var(--cream);
+  background-image:
+    radial-gradient(ellipse 70% 42% at 12% -6%, #e9f2df 0%, transparent 62%),
+    radial-gradient(ellipse 60% 40% at 92% 2%, #fdf1dc 0%, transparent 58%),
+    radial-gradient(ellipse 80% 50% at 50% 108%, #eef4e8 0%, transparent 60%);
+  background-repeat: no-repeat;
 }
 
 button,
@@ -43,7 +52,191 @@ button {
 
 ::selection {
   background: #dce9ce;
-  color: #234b35;
+  color: var(--moss);
+}
+
+/* ---------- keyframes ---------- */
+
+@keyframes cuk-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(3%, -5%, 0) scale(1.07);
+  }
+  66% {
+    transform: translate3d(-4%, 4%, 0) scale(0.95);
+  }
+}
+
+@keyframes cuk-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+@keyframes cuk-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes cuk-shimmer {
+  from {
+    background-position: -140% 0;
+  }
+  to {
+    background-position: 240% 0;
+  }
+}
+
+@keyframes cuk-sheen {
+  from {
+    transform: translateX(-120%) skewX(-14deg);
+  }
+  to {
+    transform: translateX(220%) skewX(-14deg);
+  }
+}
+
+@keyframes cuk-pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(162, 189, 112, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 9px rgba(162, 189, 112, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(162, 189, 112, 0);
+  }
+}
+
+@keyframes cuk-pop {
+  0% {
+    transform: scale(0.7);
+  }
+  60% {
+    transform: scale(1.22);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ---------- utilities ---------- */
+
+.cuk-blob {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(58px);
+  opacity: 0.55;
+  pointer-events: none;
+  animation: cuk-drift 16s ease-in-out infinite;
+}
+
+.cuk-float {
+  animation: cuk-float 6s ease-in-out infinite;
+}
+
+.cuk-live-dot {
+  position: relative;
+  display: inline-block;
+  height: 8px;
+  width: 8px;
+  border-radius: 999px;
+  background: var(--lime);
+  animation: cuk-pulse-ring 2.4s ease-out infinite;
+}
+
+.cuk-marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.cuk-marquee__track {
+  display: flex;
+  width: max-content;
+  gap: 2rem;
+  animation: cuk-marquee 32s linear infinite;
+}
+
+.cuk-marquee:hover .cuk-marquee__track {
+  animation-play-state: paused;
+}
+
+.cuk-skeleton {
+  background-color: #eef1e9;
+  background-image: linear-gradient(
+    100deg,
+    transparent 18%,
+    rgba(255, 255, 255, 0.85) 42%,
+    transparent 66%
+  );
+  background-size: 220% 100%;
+  animation: cuk-shimmer 1.5s linear infinite;
+}
+
+/* Sweep of light across a tile when its container is hovered (.cuk-sheen-host). */
+.cuk-sheen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cuk-sheen::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 42%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+  transform: translateX(-120%) skewX(-14deg);
+}
+
+.cuk-sheen-host:hover .cuk-sheen::after {
+  animation: cuk-sheen 0.9s ease-out;
+}
+
+.cuk-dots {
+  background-image: radial-gradient(
+    currentColor 1px,
+    transparent 1px
+  );
+  background-size: 14px 14px;
+  opacity: 0.16;
+}
+
+.cuk-grid-lines {
+  background-image:
+    linear-gradient(to right, rgba(35, 75, 53, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(35, 75, 53, 0.07) 1px, transparent 1px);
+  background-size: 46px 46px;
+}
+
+.cuk-grad-text {
+  background: linear-gradient(96deg, var(--moss) 8%, #5d8a5b 46%, var(--lime) 92%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.cuk-pop {
+  animation: cuk-pop 0.32s ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -52,6 +245,12 @@ button {
   *::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .cuk-blob,
+  .cuk-float {
+    animation: none !important;
   }
 }

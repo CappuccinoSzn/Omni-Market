@@ -2,7 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, RefreshCw, ShoppingBag } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Check,
+  MapPin,
+  PlugZap,
+  RefreshCw,
+  ShoppingBag,
+  WalletMinimal,
+} from "lucide-react";
 import { useCartView } from "@/app/lib/cart";
 import { money } from "@/app/lib/format";
 import { useOrders, type Order } from "@/app/lib/local-data";
@@ -13,10 +23,10 @@ import {
   btnGhost,
   btnPrimary,
   card,
-  eyebrow,
   input,
+  kicker,
   label,
-  noticePanel,
+  rule,
 } from "./styles";
 
 const counties = [
@@ -91,39 +101,57 @@ export default function CheckoutView() {
 
   if (placed) {
     return (
-      <main className="mx-auto w-full max-w-[900px] px-4 py-14 sm:px-8 lg:px-12">
-        <div className={`${card} text-center`}>
-          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#edf2e8]">
-            <Check size={26} className="text-[#234b35]" />
-          </span>
-          <h1 className="mt-5 text-2xl font-semibold sm:text-3xl">
-            Order {placed.id} is recorded
+      <main className="relative mx-auto w-full max-w-[900px] px-4 py-14 sm:px-8 lg:px-12">
+        <span
+          className="cuk-blob left-[6%] top-2 h-[240px] w-[240px] opacity-35"
+          style={{ background: "#9ec77f" }}
+          aria-hidden
+        />
+        <div className="relative overflow-hidden rounded-[30px] border border-[#e6e9dd] bg-gradient-to-br from-white to-[#f4f8ee] p-6 text-center shadow-[0_24px_60px_rgba(28,54,34,0.10)] sm:p-9">
+          <span className="cuk-dots absolute inset-0 text-[#234b35]" aria-hidden />
+          <motion.span
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 320, damping: 18 }}
+            className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#2c5c3f] to-[#173624] text-white shadow-[0_16px_34px_rgba(28,64,42,0.32)]"
+          >
+            <Check size={30} strokeWidth={3} />
+          </motion.span>
+          <h1 className="relative mt-6 text-2xl font-semibold tracking-tight sm:text-3xl">
+            Order{" "}
+            <span className="cuk-grad-text font-mono font-bold italic">
+              {placed.id}
+            </span>{" "}
+            is recorded
           </h1>
-          <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-gray-600">
+          <p className="relative mx-auto mt-3 max-w-lg text-sm leading-6 text-gray-600">
             We saved {placed.itemCount} item{placed.itemCount === 1 ? "" : "s"} for{" "}
             <strong>{money(placed.total)}</strong> with your delivery details.
             Omni Market has not charged you anything and no payment has been made.
           </p>
 
-          <div className={`${noticePanel} mt-6 text-left`}>
-            <p className="font-semibold">What this record is</p>
-            <ol className="mt-3 space-y-2 text-sm">
-              <li>
-                1. It stays in this browser so you can quote the reference when
-                you arrange handover.
-              </li>
-              <li>
-                2. It is not sent to a seller or to our team — the marketplace has
-                no order backend or messaging yet.
-              </li>
-              <li>
-                3. Agree the price, delivery fee and payment with the seller
-                directly, then pay at handover.
-              </li>
+          <div className="relative mt-7 rounded-[26px] border border-[#dfead0] bg-white/85 p-5 text-left shadow-[0_10px_28px_rgba(28,54,34,0.06)] backdrop-blur">
+            <p className={kicker}>
+              <BadgeCheck size={13} className="text-[#315e43]" />
+              What this record is
+            </p>
+            <ol className="mt-4 space-y-3 text-sm leading-6">
+              {[
+                "It stays in this browser so you can quote the reference when you arrange handover.",
+                "It is not sent to a seller or to our team — the marketplace has no order backend or messaging yet.",
+                "Agree the price, delivery fee and payment with the seller directly, then pay at handover.",
+              ].map((step, index) => (
+                <li key={step} className="flex gap-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2c5c3f] to-[#173624] text-[11px] font-bold text-[#c5dba9]">
+                    {index + 1}
+                  </span>
+                  <span className="text-gray-600">{step}</span>
+                </li>
+              ))}
             </ol>
           </div>
 
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
+          <div className="relative mt-7 flex flex-wrap justify-center gap-3">
             <Link href="/dashboard?tab=orders" className={btnPrimary}>
               View my orders <ArrowRight size={16} />
             </Link>
@@ -138,13 +166,23 @@ export default function CheckoutView() {
 
   if (status === "error") {
     return (
-      <main className="mx-auto w-full max-w-[900px] px-4 py-16 sm:px-8 lg:px-12">
-        <div className={noticePanel}>
-          <p className="font-semibold">Checkout cannot price your bag.</p>
-          <p className="mt-1 text-[#40544a]">{error}</p>
+      <main className="relative mx-auto w-full max-w-[900px] px-4 py-16 sm:px-8 lg:px-12">
+        <span
+          className="cuk-blob right-[8%] top-6 h-[220px] w-[220px] opacity-40"
+          style={{ background: "#f0b429" }}
+          aria-hidden
+        />
+        <div className="relative mx-auto max-w-xl rounded-[28px] border border-[#e6d9bd] bg-gradient-to-br from-[#fdf7ea] to-white p-7 text-center shadow-[0_18px_46px_rgba(28,54,34,0.08)]">
+          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#f0b429] to-[#dd7a55] text-white shadow-[0_12px_26px_rgba(221,122,85,0.3)]">
+            <PlugZap size={26} />
+          </span>
+          <p className="mt-5 text-lg font-semibold">
+            Checkout cannot price your bag.
+          </p>
+          <p className="mt-1 text-sm text-[#40544a]">{error}</p>
           <button
             onClick={() => loadProducts(true)}
-            className={`${btnPrimary} mt-4`}
+            className={`${btnPrimary} mt-5`}
           >
             <RefreshCw size={16} />
             Try again
@@ -157,12 +195,19 @@ export default function CheckoutView() {
   if (!ready) {
     return (
       <main className="mx-auto w-full max-w-[900px] px-4 py-16 sm:px-8 lg:px-12">
-        <h1 className="text-3xl font-semibold tracking-tight">Checkout</h1>
-        <p className="mt-2 text-sm text-gray-500">
+        <p className={kicker}>
+          <span className="cuk-live-dot" aria-hidden />
+          Final step
+        </p>
+        <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+          Checkout
+        </h1>
+        <div className={rule} />
+        <p className="mt-4 text-sm text-gray-500">
           Checking {cartCount} saved item{cartCount === 1 ? "" : "s"} against live
           listings...
         </p>
-        <div className="mt-8 h-56 animate-pulse rounded-3xl bg-[#eef1e9]" />
+        <div className="cuk-skeleton mt-8 h-56 rounded-3xl" />
       </main>
     );
   }
@@ -170,51 +215,88 @@ export default function CheckoutView() {
   if (lines.length === 0) {
     return (
       <main className="mx-auto w-full max-w-[900px] px-4 py-16 sm:px-8 lg:px-12">
-        <div className={`${card} text-center`}>
-          <ShoppingBag size={42} className="mx-auto text-[#719267]" />
-          <h1 className="mt-5 text-2xl font-semibold">Nothing to check out yet</h1>
-          <p className="mx-auto mt-2 max-w-md text-sm text-gray-500">
+        <div className="relative overflow-hidden rounded-[30px] border border-dashed border-[#cfd9c4] bg-gradient-to-br from-[#f2f7ec] to-white px-6 py-14 text-center">
+          <motion.span
+            initial={{ scale: 0.86, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            className="cuk-float mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-white text-[#315e43] shadow-[0_16px_38px_rgba(28,54,34,0.12)]"
+          >
+            <ShoppingBag size={34} />
+          </motion.span>
+          <h1 className="mt-6 text-2xl font-semibold tracking-tight sm:text-3xl">
+            Nothing to{" "}
+            <span className="cuk-grad-text font-serif font-normal italic">
+              check out
+            </span>{" "}
+            yet
+          </h1>
+          <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-gray-500">
             {unavailable > 0
               ? `${unavailable} item${unavailable === 1 ? "" : "s"} in your bag point at listings that are no longer published, so there is nothing left to order.`
               : "Add listings to your bag and they will appear here with delivery options."}
           </p>
           {unavailable > 0 && (
-            <button onClick={clearCart} className={`${btnGhost} mt-4`}>
+            <button onClick={clearCart} className={`${btnGhost} mt-5`}>
               Clear saved ids
             </button>
           )}
-          <Link href="/products" className={`${btnPrimary} mt-6`}>
-            Browse listings <ArrowRight size={16} />
-          </Link>
+          <div className="mt-6 flex justify-center">
+            <Link href="/products" className={btnPrimary}>
+              Browse listings <ArrowRight size={16} />
+            </Link>
+          </div>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto w-full max-w-[1360px] px-4 py-12 sm:px-8 sm:py-16 lg:px-12">
-      <Link href="/cart" className="text-sm text-gray-500 hover:text-[#234b35]">
-        ← Back to my bag
+    <main className="relative mx-auto w-full max-w-[1360px] px-4 py-12 sm:px-8 sm:py-16 lg:px-12">
+      <span
+        className="cuk-blob right-[-6%] top-8 h-[250px] w-[250px] opacity-30"
+        style={{ background: "#9ec77f" }}
+        aria-hidden
+      />
+
+      <Link
+        href="/cart"
+        className="relative inline-flex items-center gap-2 rounded-full border border-[#e2e7dc] bg-white/85 px-4 py-2 text-sm text-gray-600 transition hover:-translate-x-1 hover:border-[#8fae86] hover:text-[#234b35]"
+      >
+        <ArrowRight size={15} className="rotate-180" />
+        Back to my bag
       </Link>
 
-      <div className="mt-4">
-        <p className={eyebrow}>Final step</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-          Checkout
+      <div className="relative mt-5">
+        <p className={kicker}>
+          <span className="cuk-live-dot" aria-hidden />
+          Final step
+        </p>
+        <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+          Checkout{" "}
+          <span className="cuk-grad-text font-serif font-normal italic">
+            without the wallet
+          </span>
         </h1>
-        <p className="mt-2 text-sm text-gray-500">
+        <div className={rule} />
+        <p className="mt-4 max-w-2xl text-sm leading-6 text-gray-500 sm:text-base">
           Record what you want and where it should go. Nothing is charged and no
           payment is taken here.
         </p>
       </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+      <div className="relative mt-8 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
         <form
           onSubmit={handleSubmit}
-          className="space-y-8 rounded-3xl border border-[#e6e8df] bg-white p-5 sm:p-8"
+          className="space-y-8 rounded-[28px] border border-[#e6e9dd] bg-gradient-to-br from-white to-[#fafcf6] p-5 shadow-[0_16px_44px_rgba(28,54,34,0.07)] sm:p-8"
         >
           <section>
-            <h2 className="text-lg font-semibold">Contact information</h2>
+            <h2 className="flex items-center gap-2.5 text-lg font-semibold">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#eaf2e0] to-[#f7f9f1] text-[#315e43] ring-1 ring-[#e0e8d6]">
+                <BadgeCheck size={16} />
+              </span>
+              Contact information
+            </h2>
 
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <label className={label}>
@@ -246,22 +328,44 @@ export default function CheckoutView() {
             </div>
           </section>
 
-          <section className="border-t border-[#e6e8df] pt-6">
-            <h2 className="text-lg font-semibold">Delivery</h2>
+          <section className="border-t border-[#e6e9dd] pt-7">
+            <h2 className="flex items-center gap-2.5 text-lg font-semibold">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#eaf2e0] to-[#f7f9f1] text-[#315e43] ring-1 ring-[#e0e8d6]">
+                <MapPin size={16} />
+              </span>
+              Delivery
+            </h2>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {deliveryMethods.map((option) => (
                 <label
                   key={option.id}
-                  className={`cursor-pointer rounded-2xl border p-4 text-sm transition ${
+                  className={`relative cursor-pointer overflow-hidden rounded-2xl border p-4 text-sm transition duration-200 ${
                     method === option.id
-                      ? "border-[#234b35] bg-[#edf2e8]"
-                      : "border-[#dfe3d9] bg-white hover:border-[#cbd7c2]"
+                      ? "border-[#234b35] bg-gradient-to-br from-[#eef4e6] to-white shadow-[0_12px_28px_rgba(28,64,42,0.12)]"
+                      : "border-[#dfe3d9] bg-white hover:-translate-y-0.5 hover:border-[#a8c199] hover:shadow-[0_10px_22px_rgba(28,54,34,0.07)]"
                   }`}
                 >
+                  <span
+                    className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#234b35] via-[#719477] to-[#c5dba9] transition ${
+                      method === option.id ? "opacity-100" : "opacity-0"
+                    }`}
+                    aria-hidden
+                  />
                   <div className="flex items-center justify-between gap-3">
-                    <span className="font-semibold">{option.name}</span>
-                    <span className="text-xs font-semibold text-[#315e43]">
+                    <span className="flex items-center gap-2 font-semibold">
+                      <span
+                        className={`flex h-5 w-5 items-center justify-center rounded-full border transition ${
+                          method === option.id
+                            ? "border-[#234b35] bg-[#234b35] text-white"
+                            : "border-[#cfd7c6] bg-white"
+                        }`}
+                      >
+                        {method === option.id && <Check size={12} strokeWidth={3} />}
+                      </span>
+                      {option.name}
+                    </span>
+                    <span className="rounded-full bg-white/80 px-2 py-1 text-[10px] font-bold uppercase tracking-[1px] text-[#315e43] ring-1 ring-[#e0e8d6]">
                       {option.feeLabel}
                     </span>
                   </div>
@@ -325,9 +429,14 @@ export default function CheckoutView() {
             </div>
           </section>
 
-          <section className="border-t border-[#e6e8df] pt-6">
-            <h2 className="text-lg font-semibold">Payment</h2>
-            <p className="mt-2 text-sm leading-6 text-gray-500">
+          <section className="border-t border-[#e6e9dd] pt-7">
+            <h2 className="flex items-center gap-2.5 text-lg font-semibold">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#eaf2e0] to-[#f7f9f1] text-[#315e43] ring-1 ring-[#e0e8d6]">
+                <WalletMinimal size={16} />
+              </span>
+              Payment
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-gray-500">
               Pay the seller by M-Pesa or cash at handover. Omni Market does not
               process payments, so this form places no charge on you or the
               seller.
@@ -339,62 +448,73 @@ export default function CheckoutView() {
           </button>
         </form>
 
-        <aside className={`${card} h-fit lg:sticky lg:top-28`}>
-          <h2 className="text-lg font-semibold">Your order</h2>
+        <aside className={`${card} relative h-fit overflow-hidden lg:sticky lg:top-28`}>
+          <span
+            className="cuk-blob left-[-14%] top-[-35%] h-[190px] w-[190px] opacity-25"
+            style={{ background: "#a2bd70" }}
+            aria-hidden
+          />
+          <div className="relative">
+            <p className={kicker}>
+              <span className="cuk-live-dot" aria-hidden />
+              Your order
+            </p>
 
-          <div className="mt-5 space-y-5">
-            {unavailable > 0 && (
-              <p className="rounded-2xl bg-[#fdf1f1] px-4 py-3 text-xs text-red-700">
-                {unavailable} saved item{unavailable === 1 ? "" : "s"} is no longer
-                listed and is not included.
-              </p>
-            )}
+            <div className="mt-5 space-y-4">
+              {unavailable > 0 && (
+                <p className="rounded-2xl border border-[#f2d8d8] bg-gradient-to-br from-[#fdf1f1] to-white px-4 py-3 text-xs leading-5 text-red-700">
+                  {unavailable} saved item{unavailable === 1 ? "" : "s"} is no
+                  longer listed and is not included.
+                </p>
+              )}
 
-            {lines.map((line) => (
-              <div key={line.product.id} className="flex gap-3">
-                <div className="w-16 shrink-0">
-                  <ProductMedia
-                    product={line.product}
-                    rounded="rounded-xl"
-                    className="h-16"
-                  />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold">{line.product.name}</p>
-                  <p className="mt-1 text-xs text-gray-500">
-                    Quantity: {line.quantity} · {line.product.seller}
+              {lines.map((line) => (
+                <div
+                  key={line.product.id}
+                  className="flex gap-3 rounded-2xl border border-[#eef1e7] bg-white/80 p-2.5 transition hover:border-[#d7e3c9]"
+                >
+                  <div className="w-16 shrink-0 overflow-hidden rounded-xl">
+                    <ProductMedia product={line.product} rounded="" className="h-16" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold">{line.product.name}</p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Quantity: {line.quantity} · {line.product.seller}
+                    </p>
+                  </div>
+                  <p className="shrink-0 text-sm font-semibold text-[#1f4531]">
+                    {money(line.product.price * line.quantity)}
                   </p>
                 </div>
-                <p className="shrink-0 text-sm font-semibold">
-                  {money(line.product.price * line.quantity)}
-                </p>
+              ))}
+            </div>
+
+            <div className="mt-6 space-y-3 border-t border-[#e6e9dd] pt-5 text-sm">
+              <div className="flex justify-between gap-4">
+                <span className="text-gray-500">
+                  Subtotal ({itemCount} item{itemCount === 1 ? "" : "s"})
+                </span>
+                <span className="font-semibold">{money(subtotal)}</span>
               </div>
-            ))}
-          </div>
+              <div className="flex justify-between gap-4">
+                <span className="text-gray-500">{selectedMethod.name}</span>
+                <span className="text-gray-500">
+                  {selectedMethod.id === "pickup" ? "Free" : "With seller"}
+                </span>
+              </div>
+              <div className="flex items-end justify-between gap-4 border-t border-[#e6e9dd] pt-4">
+                <span className="font-semibold">Listings total</span>
+                <span className="bg-gradient-to-r from-[#234b35] to-[#5d8a5b] bg-clip-text text-2xl font-black tracking-tight text-transparent">
+                  {money(subtotal)}
+                </span>
+              </div>
+            </div>
 
-          <div className="mt-6 space-y-3 border-t border-[#e6e8df] pt-5 text-sm">
-            <div className="flex justify-between gap-4">
-              <span className="text-gray-500">
-                Subtotal ({itemCount} item{itemCount === 1 ? "" : "s"})
-              </span>
-              <span className="font-semibold">{money(subtotal)}</span>
-            </div>
-            <div className="flex justify-between gap-4">
-              <span className="text-gray-500">{selectedMethod.name}</span>
-              <span className="text-gray-500">
-                {selectedMethod.id === "pickup" ? "Free" : "With seller"}
-              </span>
-            </div>
-            <div className="flex justify-between gap-4 border-t border-[#e6e8df] pt-4">
-              <span className="font-semibold">Listings total</span>
-              <span className="text-xl font-bold">{money(subtotal)}</span>
-            </div>
+            <p className="mt-5 text-xs leading-5 text-gray-500">
+              Check each listing&rsquo;s price and condition, then agree the final
+              figure with the seller before paying.
+            </p>
           </div>
-
-          <p className="mt-5 text-xs leading-5 text-gray-500">
-            Check each listing&rsquo;s price and condition, then agree the final
-            figure with the seller before paying.
-          </p>
         </aside>
       </div>
     </main>
